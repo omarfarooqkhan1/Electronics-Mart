@@ -1,6 +1,6 @@
-# Electronics Mart - Backend
+# Electronics Mart - Laravel Backend
 
-Laravel API backend for Electronics Mart e-commerce platform.
+Modern Laravel API backend for Electronics Mart e-commerce platform with authentication-only access.
 
 ## 🚀 Quick Start
 
@@ -10,44 +10,57 @@ composer install
 
 # Configure environment
 cp .env.example .env
-# Edit .env with your database credentials
 
 # Generate application key
 php artisan key:generate
 
-# Run migrations
-php artisan migrate
+# Create SQLite database
+touch database/database.sqlite
+
+# Run migrations and seed data
+php artisan migrate --seed
 
 # Start development server
 php artisan serve
-# API runs on http://localhost:8000
 ```
+
+The API will be available at `http://localhost:8000`
 
 ## 🛠️ Tech Stack
 
 - **Laravel 11** with PHP 8.2+
-- **MySQL** database
-- **Laravel Sanctum** for authentication
-- **Laravel Mail** for email notifications
-- **Local Image Storage** (replaced Cloudinary for cost savings)
-- **Stripe** for payment processing
+- **SQLite** database (default) / MySQL (optional)
+- **Laravel Sanctum** for API authentication
+- **Laravel Mail** with Mailpit for development
+- **Local File Storage** for product images
+- **Modern Admin Dashboard** with Tailwind CSS + DaisyUI
 
 ## 🧩 Key Features
 
-- **Product Management** with variants and images
-- **Order Management** with tracking support
-- **Dual Authentication** (Auth0 + traditional)
-- **Guest Checkout** functionality
-- **Admin Dashboard** API endpoints
-- **Email Notifications** with professional templates
-- **Bulk Operations** for product management
-- **Product Review System** with media support
-- **Stripe Payment Integration** with webhook handling
-- **Local Image Storage** with automatic optimization
+### Core Functionality
+- **Authentication-Only API** - All endpoints require user authentication
+- **Product Management** - Electronics catalog with categories and brands
+- **Shopping Cart** - Persistent cart with price preservation
+- **Order Management** - 5-state order system (processing → confirmed → shipped → delivered → cancelled)
+- **Admin Dashboard** - Modern web interface for store management
+
+### Technical Features
+- **JWT Authentication** with Laravel Sanctum
+- **Price Preservation** - Cart and order prices locked at time of addition
+- **Tax-Inclusive Pricing** - Simplified European-style pricing
+- **Free Shipping** - No shipping calculations required
+- **Email Notifications** - Order confirmations and updates
+- **Modern UI** - Responsive admin dashboard with Tailwind CSS
 
 ## 🔧 Environment Configuration
 
-### Database (.env)
+### Database (SQLite - Default)
+```env
+DB_CONNECTION=sqlite
+DB_DATABASE=database/database.sqlite
+```
+
+### Database (MySQL - Alternative)
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -57,130 +70,277 @@ DB_USERNAME=your_username
 DB_PASSWORD=your_password
 ```
 
-### Mail Configuration
+### Mail Configuration (Development)
 ```env
-MAIL_MAILER=log
+MAIL_MAILER=smtp
+MAIL_HOST=127.0.0.1
+MAIL_PORT=1025
 MAIL_FROM_ADDRESS="noreply@electronicsmart.com"
 MAIL_FROM_NAME="Electronics Mart"
 ```
 
-### Stripe Configuration
+### Application Settings
 ```env
-STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key_here
-STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key_here
-STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here
+APP_NAME="Electronics Mart"
+APP_URL=http://localhost:8000
+APP_TIMEZONE=UTC
+CURRENCY=EUR
 ```
 
-### Local Image Storage
+## 📦 Installation Guide
+
+### 1. Clone and Install
+```bash
+git clone <repository-url>
+cd electronics-mart-backend
+composer install
+```
+
+### 2. Environment Setup
+```bash
+# Copy environment file
+cp .env.example .env
+
+# Generate application key
+php artisan key:generate
+```
+
+### 3. Database Setup (SQLite)
+```bash
+# Create SQLite database file
+touch database/database.sqlite
+
+# Run migrations and seed sample data
+php artisan migrate --seed
+```
+
+### 4. Alternative Database Setup (MySQL)
+If you prefer MySQL, update your `.env` file:
 ```env
-FILESYSTEM_DISK=public
-IMAGE_DRIVER=gd
-IMAGE_QUALITY=85
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=electronics_mart
+DB_USERNAME=root
+DB_PASSWORD=your_password
+```
+
+Then run:
+```bash
+php artisan migrate --seed
+```
+
+### 5. Start Development Server
+```bash
+php artisan serve
 ```
 
 ## 🏗️ Development Commands
 
 ```bash
-php artisan migrate       # Run database migrations
-php artisan db:seed       # Seed sample data
-php artisan cache:clear   # Clear application cache
-php artisan test          # Run tests
+# Database operations
+php artisan migrate              # Run migrations
+php artisan migrate:fresh --seed # Fresh database with sample data
+php artisan db:seed             # Seed sample data only
+
+# Cache management
+php artisan cache:clear         # Clear application cache
+php artisan config:clear        # Clear configuration cache
+php artisan view:clear          # Clear compiled views
+
+# Development tools
+php artisan route:list          # List all routes
+php artisan tinker             # Interactive shell
 ```
 
-## 📁 API Structure
+## 🗂️ Project Structure
 
 ```
 app/
-├── Http/Controllers/Api/ # API controllers
-├── Models/              # Eloquent models
-├── Mail/               # Email templates
-└── Providers/          # Service providers
+├── Http/Controllers/
+│   ├── Api/                   # API controllers
+│   └── Admin/                 # Admin dashboard controllers
+├── Models/                    # Eloquent models
+├── Mail/                      # Email templates
+└── Http/Resources/            # API resources
 
-routes/api.php          # API route definitions
-database/migrations/    # Database schema
+database/
+├── migrations/                # Database schema
+├── seeders/                   # Sample data
+└── database.sqlite           # SQLite database file
+
+resources/views/admin/         # Admin dashboard views
+routes/
+├── api.php                   # API routes
+└── web.php                   # Web routes (admin)
 ```
 
-For full project documentation, see the main README.md in the parent directory.
+## 🔌 API Endpoints
 
-## 📦 Getting Started
+### Authentication
+- `POST /api/register` - User registration
+- `POST /api/login` - User login
+- `GET /api/user` - Get authenticated user
+- `POST /api/logout` - User logout
 
-1.  **Clone the repository:**
+### Products (Authenticated)
+- `GET /api/products` - List products with filters
+- `GET /api/products/{id}` - Get product details
+- `GET /api/products/brands` - Get available brands
+- `GET /api/categories` - List categories
 
-2.  **Install PHP dependencies:**
-    ```bash
-    composer install
-    ```
+### Shopping Cart (Authenticated)
+- `GET /api/cart` - Get cart contents
+- `POST /api/cart` - Add item to cart
+- `PUT /api/cart/{id}` - Update cart item
+- `DELETE /api/cart/{id}` - Remove cart item
+- `DELETE /api/cart` - Clear cart
 
-3.  **Copy the environment file:**
-    ```bash
-    cp .env.example .env
-    ```
+### Orders (Authenticated)
+- `GET /api/orders` - List user orders
+- `POST /api/orders` - Create order (checkout)
+- `GET /api/orders/{id}` - Get order details
+- `POST /api/orders/validate-checkout` - Validate cart before checkout
 
-4.  **Generate an application key:**
-    ```bash
-    php artisan key:generate
-    ```
-
-5.  **Configure your `.env` file:**
-    Open the `.env` file and update your database credentials (`DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`) and any other necessary environment variables.
-
-    *Example database configuration (for MySQL):*
-    ```env
-    DB_CONNECTION=mysql
-    DB_HOST=127.0.0.1
-    DB_PORT=3306
-    DB_DATABASE=ecommerce_db
-    DB_USERNAME=root
-    DB_PASSWORD=
-    ```
-
-6.  **Run database migrations:**
-    ```bash
-    php artisan migrate
-    ```
-
-7.  **Start the Laravel development server:**
-    ```bash
-    php artisan serve
-    ```
-    The API will be available at `http://localhost:8000`.
-
-## ⚙️ API Endpoints (Examples)
-
-* `GET /api/products` - Retrieve a list of all products.
-* `POST /api/register` - User registration.
-* `POST /api/login` - User login.
-* `POST /api/stripe/create-payment-intent` - Create payment intent.
-* `POST /api/products/{id}/reviews` - Create product review.
+### Admin Dashboard (Web)
+- `/admin/login` - Admin login
+- `/admin/dashboard` - Dashboard overview
+- `/admin/products` - Product management
+- `/admin/categories` - Category management
+- `/admin/orders` - Order management
+- `/admin/settings` - System settings
 
 ## 🔒 Authentication
 
-This project integrates **Auth0** for secure API authentication and authorization using JWTs. Protected routes require a valid JWT Access Token in the `Authorization: Bearer <TOKEN>` header.
+All API endpoints (except registration and login) require authentication using Laravel Sanctum tokens:
 
-## 💡 Current Implementation Status
+```bash
+# Login to get token
+curl -X POST http://localhost:8000/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"customer@example.com","password":"password123"}'
 
-This version of the backend is fully implemented with:
-- Complete product management system with variants and images
-- Order management with tracking support
-- Dual authentication system (Auth0 + traditional)
-- Guest checkout functionality
-- Admin dashboard with full CRUD operations
-- Email notifications for various events
-- Bulk operations for product management
-- Product review system with media support
-- Stripe payment integration with webhook handling
-- Local image storage with automatic optimization (replaced Cloudinary)
+# Use token in subsequent requests
+curl -X GET http://localhost:8000/api/products \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
 
-## 🛣️ Future Enhancements
+## 🛒 Sample Data
 
-* **Advanced Analytics:** Implementation of sales and user behavior tracking
-* **Inventory Management:** Advanced stock level tracking and alerts
-* **Mobile App API:** Dedicated endpoints for mobile application
+The application includes comprehensive sample data:
+
+### Categories
+- Refrigerators, Air Conditioners, Washing Machines
+- Televisions, Microwaves, Dishwashers
+- Water Heaters, Small Appliances
+
+### Products
+- 12+ sample electronics products with realistic pricing in EUR
+- Product images, specifications, and brand information
+- Featured products and stock quantities
+
+### Users
+- **Admin**: `admin@electronicsmart.com` / `password123`
+- **Customer**: `customer@example.com` / `password123`
+
+## 💰 Pricing System
+
+- **Tax-Inclusive Pricing** - All prices include VAT/tax
+- **Euro Currency** - Prices displayed in EUR (€)
+- **Free Shipping** - No shipping costs calculated
+- **Price Preservation** - Cart and order prices locked when items added
+
+## 📧 Email System
+
+Development email testing with Mailpit:
+
+1. **Install Mailpit** (optional):
+   ```bash
+   # macOS
+   brew install mailpit
+   
+   # Or download from https://github.com/axllent/mailpit
+   ```
+
+2. **Start Mailpit**:
+   ```bash
+   mailpit
+   ```
+
+3. **View emails** at `http://localhost:8025`
+
+## 🎨 Admin Dashboard
+
+Modern admin interface built with:
+- **Tailwind CSS** - Utility-first CSS framework
+- **DaisyUI** - Component library
+- **Alpine.js** - Lightweight JavaScript framework
+- **Lucide Icons** - Beautiful icon set
+
+Features:
+- Responsive design for all devices
+- Dark/light theme support
+- Real-time statistics
+- Intuitive product and order management
+
+## 🧪 Testing the API
+
+Use the included Postman collection (`Electronics Mart API Collection.json`):
+
+1. Import the collection into Postman
+2. Set the base URL to `http://localhost:8001/api` (or your server URL)
+3. Use the "Customer Login" request to authenticate
+4. Test other endpoints with automatic token management
+
+## 🚀 Production Deployment
+
+### Environment Variables
+```env
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://your-domain.com
+
+# Use MySQL/PostgreSQL for production
+DB_CONNECTION=mysql
+DB_HOST=your-db-host
+DB_DATABASE=your-db-name
+DB_USERNAME=your-db-user
+DB_PASSWORD=your-secure-password
+
+# Configure production mail service
+MAIL_MAILER=smtp
+MAIL_HOST=your-smtp-host
+MAIL_PORT=587
+MAIL_USERNAME=your-smtp-user
+MAIL_PASSWORD=your-smtp-password
+```
+
+### Deployment Commands
+```bash
+# Optimize for production
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+# Run migrations
+php artisan migrate --force
+
+# Set proper permissions
+chmod -R 755 storage bootstrap/cache
+```
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📄 License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+---
+
+**Electronics Mart** - Modern e-commerce platform built with Laravel 11
