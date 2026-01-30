@@ -1,0 +1,17 @@
+<?php
+
+use Illuminate\Foundation\Inspiring;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
+
+Artisan::command('inspire', function () {
+    $this->comment(Inspiring::quote());
+})->purpose('Display an inspiring quote');
+
+// Schedule expired guest cart cleanup
+Schedule::command('cart:cleanup-expired-guest-carts --days=7')
+    ->daily()
+    ->withoutOverlapping()
+    ->onFailure(function () {
+        \Illuminate\Support\Facades\Log::error('Failed to cleanup expired guest carts');
+    });
