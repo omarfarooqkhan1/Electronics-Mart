@@ -63,16 +63,28 @@ class Product extends Model
 
     // Note: Product variants removed for simplicity
 
-    // Polymorphic relationship to Images
+    // Polymorphic relationship to Images - get all images
     public function images()
+    {
+        return $this->morphMany(Image::class, 'imageable')->orderBy('sort_order');
+    }
+    
+    // Get all images regardless of type (alias for consistency)
+    public function allImages()
+    {
+        return $this->morphMany(Image::class, 'imageable')->orderBy('sort_order');
+    }
+
+    // Get main images only
+    public function mainImages()
     {
         return $this->morphMany(Image::class, 'imageable')->where('image_type', 'main')->orderBy('sort_order');
     }
-    
-    // Get all images regardless of type
-    public function allImages()
+
+    // Get gallery images only
+    public function galleryImages()
     {
-        return $this->morphMany(Image::class, 'imageable')->orderBy('image_type')->orderBy('sort_order');
+        return $this->morphMany(Image::class, 'imageable')->where('image_type', 'gallery')->orderBy('sort_order');
     }
 
     // Get detailed images

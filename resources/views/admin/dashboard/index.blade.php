@@ -2,7 +2,7 @@
 
 @section('title', 'Dashboard')
 @section('page-title', 'Dashboard')
-@section('page-description', 'Welcome back! Here\'s what\'s happening with your Electronics Mart today.')
+@section('page-description', 'Welcome back! Here\'s what\'s happening with NI Drip Central today.')
 
 @section('content')
 <div x-data="dashboard()" x-init="init()">
@@ -13,19 +13,19 @@
             <div class="flex items-center justify-between">
                 <div class="flex-1">
                     <div class="flex items-center space-x-2 mb-2">
-                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                            <i data-lucide="package" class="w-5 h-5 text-white"></i>
+                        <div class="w-10 h-10 bg-gradient-to-br from-lime-400 to-lime-600 rounded-xl flex items-center justify-center">
+                            <i data-lucide="package" class="w-5 h-5 text-black"></i>
                         </div>
                         <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Products</h3>
                     </div>
                     <div class="space-y-1">
                         <p class="text-3xl font-bold text-gray-900">{{ number_format($stats['active_products']) }}</p>
                         <p class="text-sm text-gray-500">
-                            <span class="text-green-600 font-medium">{{ $stats['total_products'] }}</span> total products
+                            <span class="text-lime-600 font-medium">{{ $stats['total_products'] }}</span> total products
                         </p>
                     </div>
                 </div>
-                <div class="text-blue-500 opacity-20 group-hover:opacity-30 transition-opacity">
+                <div class="text-lime-500 opacity-20 group-hover:opacity-30 transition-opacity">
                     <i data-lucide="trending-up" class="w-8 h-8"></i>
                 </div>
             </div>
@@ -36,7 +36,7 @@
             <div class="flex items-center justify-between">
                 <div class="flex-1">
                     <div class="flex items-center space-x-2 mb-2">
-                        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
+                        <div class="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl flex items-center justify-center">
                             <i data-lucide="tags" class="w-5 h-5 text-white"></i>
                         </div>
                         <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Categories</h3>
@@ -44,11 +44,11 @@
                     <div class="space-y-1">
                         <p class="text-3xl font-bold text-gray-900">{{ number_format($stats['active_categories']) }}</p>
                         <p class="text-sm text-gray-500">
-                            <span class="text-green-600 font-medium">{{ $stats['total_categories'] }}</span> total categories
+                            <span class="text-pink-600 font-medium">{{ $stats['total_categories'] }}</span> total categories
                         </p>
                     </div>
                 </div>
-                <div class="text-purple-500 opacity-20 group-hover:opacity-30 transition-opacity">
+                <div class="text-pink-500 opacity-20 group-hover:opacity-30 transition-opacity">
                     <i data-lucide="grid-3x3" class="w-8 h-8"></i>
                 </div>
             </div>
@@ -59,7 +59,7 @@
             <div class="flex items-center justify-between">
                 <div class="flex-1">
                     <div class="flex items-center space-x-2 mb-2">
-                        <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center">
                             <i data-lucide="shopping-cart" class="w-5 h-5 text-white"></i>
                         </div>
                         <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">New Orders</h3>
@@ -71,7 +71,7 @@
                         </p>
                     </div>
                 </div>
-                <div class="text-orange-500 opacity-20 group-hover:opacity-30 transition-opacity">
+                <div class="text-blue-500 opacity-20 group-hover:opacity-30 transition-opacity">
                     <i data-lucide="shopping-bag" class="w-8 h-8"></i>
                 </div>
             </div>
@@ -82,7 +82,7 @@
             <div class="flex items-center justify-between">
                 <div class="flex-1">
                     <div class="flex items-center space-x-2 mb-2">
-                        <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                        <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
                             <i data-lucide="euro" class="w-5 h-5 text-white"></i>
                         </div>
                         <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Revenue</h3>
@@ -94,7 +94,7 @@
                         </p>
                     </div>
                 </div>
-                <div class="text-green-500 opacity-20 group-hover:opacity-30 transition-opacity">
+                <div class="text-orange-500 opacity-20 group-hover:opacity-30 transition-opacity">
                     <i data-lucide="trending-up" class="w-8 h-8"></i>
                 </div>
             </div>

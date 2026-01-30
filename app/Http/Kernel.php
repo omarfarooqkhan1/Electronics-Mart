@@ -54,6 +54,7 @@ class Kernel extends HttpKernel
             'throttle:api',
             // Substitute route bindings
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            // Handle CORS for API requests
             \Illuminate\Http\Middleware\HandleCors::class,
         ],
     ];

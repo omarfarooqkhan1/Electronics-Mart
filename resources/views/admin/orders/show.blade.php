@@ -26,8 +26,8 @@
                         'cancelled' => 'bg-red-100 text-red-800',
                     ];
                 @endphp
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold {{ $statusColors[$order->order_status] ?? 'bg-gray-100 text-gray-800' }}">
-                    {{ ucfirst($order->order_status) }}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold {{ $statusColors[$order->status] ?? 'bg-gray-100 text-gray-800' }}">
+                    {{ ucfirst($order->status) }}
                 </span>
                 <a href="{{ route('admin.orders.edit', $order) }}" 
                    class="bg-gray-900 text-white px-6 py-2 rounded-xl font-bold hover:bg-black transition-colors inline-flex items-center gap-2">
@@ -48,7 +48,7 @@
                 </h2>
                 
                 <div class="space-y-4">
-                    @foreach($order->orderItems as $item)
+                    @foreach($order->items as $item)
                         <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl">
                             @if($item->product && $item->product->images->first())
                                 <img src="{{ $item->product->images->first()->url }}" 
@@ -91,11 +91,11 @@
                         </div>
                     </div>
                     
-                    @if($order->order_status !== 'processing')
+                    @if($order->status !== 'processing')
                         <div class="flex items-center gap-4">
                             <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
                             <div>
-                                <p class="font-medium text-gray-900">Status: {{ ucfirst($order->order_status) }}</p>
+                                <p class="font-medium text-gray-900">Status: {{ ucfirst($order->status) }}</p>
                                 <p class="text-sm text-gray-600">{{ $order->updated_at->format('M d, Y \a\t h:i A') }}</p>
                             </div>
                         </div>
@@ -120,16 +120,16 @@
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600">Tax</span>
-                        <span class="font-medium">€{{ number_format($order->tax_amount, 2) }}</span>
+                        <span class="font-medium">€{{ number_format($order->tax, 2) }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600">Shipping</span>
-                        <span class="font-medium">€{{ number_format($order->shipping_amount, 2) }}</span>
+                        <span class="font-medium">€{{ number_format($order->shipping, 2) }}</span>
                     </div>
                     <div class="border-t border-gray-200 pt-3">
                         <div class="flex justify-between">
                             <span class="text-lg font-bold text-gray-900">Total</span>
-                            <span class="text-lg font-bold text-gray-900">€{{ number_format($order->total_amount, 2) }}</span>
+                            <span class="text-lg font-bold text-gray-900">€{{ number_format($order->total, 2) }}</span>
                         </div>
                     </div>
                 </div>
@@ -172,29 +172,16 @@
                     Shipping Address
                 </h2>
                 
-                @if($order->shipping_address)
-                    <div class="text-sm text-gray-600 space-y-1">
-                        @if(isset($order->shipping_address['street']))
-                            <p>{{ $order->shipping_address['street'] }}</p>
-                        @endif
-                        <p>
-                            @if(isset($order->shipping_address['city']))
-                                {{ $order->shipping_address['city'] }}
-                            @endif
-                            @if(isset($order->shipping_address['state']))
-                                , {{ $order->shipping_address['state'] }}
-                            @endif
-                            @if(isset($order->shipping_address['postal_code']))
-                                {{ $order->shipping_address['postal_code'] }}
-                            @endif
-                        </p>
-                        @if(isset($order->shipping_address['country']))
-                            <p>{{ $order->shipping_address['country'] }}</p>
-                        @endif
-                    </div>
-                @else
-                    <p class="text-sm text-gray-500">No shipping address provided</p>
-                @endif
+                <div class="text-sm text-gray-600 space-y-1">
+                    <p><strong>{{ $order->shipping_name }}</strong></p>
+                    <p>{{ $order->shipping_email }}</p>
+                    @if($order->shipping_phone)
+                        <p>{{ $order->shipping_phone }}</p>
+                    @endif
+                    <p>{{ $order->shipping_address }}</p>
+                    <p>{{ $order->shipping_city }}, {{ $order->shipping_state }} {{ $order->shipping_postal_code }}</p>
+                    <p>{{ $order->shipping_country }}</p>
+                </div>
             </div>
 
             <!-- Quick Actions -->
@@ -205,7 +192,7 @@
                 </h2>
                 
                 <div class="space-y-3">
-                    @if($order->order_status === 'processing')
+                    @if($order->status === 'processing')
                         <form method="POST" action="{{ route('admin.orders.update-status', $order) }}" class="w-full">
                             @csrf
                             @method('PATCH')
@@ -216,7 +203,7 @@
                         </form>
                     @endif
                     
-                    @if($order->order_status === 'confirmed')
+                    @if($order->status === 'confirmed')
                         <form method="POST" action="{{ route('admin.orders.update-status', $order) }}" class="w-full">
                             @csrf
                             @method('PATCH')
@@ -227,7 +214,7 @@
                         </form>
                     @endif
                     
-                    @if($order->order_status === 'shipped')
+                    @if($order->status === 'shipped')
                         <form method="POST" action="{{ route('admin.orders.update-status', $order) }}" class="w-full">
                             @csrf
                             @method('PATCH')
@@ -238,7 +225,7 @@
                         </form>
                     @endif
                     
-                    @if(in_array($order->order_status, ['processing', 'confirmed']))
+                    @if(in_array($order->status, ['processing', 'confirmed']))
                         <form method="POST" action="{{ route('admin.orders.update-status', $order) }}" class="w-full" 
                               onsubmit="return confirm('Are you sure you want to cancel this order?')">
                             @csrf

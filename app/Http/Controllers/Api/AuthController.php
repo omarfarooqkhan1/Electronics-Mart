@@ -62,6 +62,7 @@ class AuthController extends Controller
 
         if (!$user->email_verification_code || 
             $user->email_verification_code !== $validated['code'] ||
+            !$user->email_verification_code_created_at ||
             $user->email_verification_code_created_at->addMinutes(10)->isPast()) {
             return response()->json([
                 'message' => 'Invalid or expired verification code'
@@ -200,7 +201,7 @@ class AuthController extends Controller
 
         // Send reset code to email
         try {
-            Mail::to($user->email)->send(new EmailVerificationCode($code, 'Password Reset'));
+            Mail::to($user->email)->send(new EmailVerificationCode($code));
         } catch (\Exception $e) {
             \Log::error('Failed to send password reset email', ['error' => $e->getMessage()]);
         }
@@ -225,6 +226,7 @@ class AuthController extends Controller
 
         if (!$user->password_reset_code || 
             $user->password_reset_code !== $validated['code'] ||
+            !$user->password_reset_code_created_at ||
             $user->password_reset_code_created_at->addMinutes(10)->isPast()) {
             return response()->json([
                 'message' => 'Invalid or expired reset code'

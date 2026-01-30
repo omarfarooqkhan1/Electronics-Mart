@@ -26,7 +26,7 @@ class AdminOrderController extends Controller
         
         // Filter by status
         if ($request->filled('status')) {
-            $query->where('order_status', $request->status);
+            $query->where('status', $request->status);
         }
         
         // Filter by date range
@@ -43,11 +43,11 @@ class AdminOrderController extends Controller
         // Get status counts for filter tabs
         $statusCounts = [
             'all' => Order::count(),
-            'processing' => Order::where('order_status', 'processing')->count(),
-            'confirmed' => Order::where('order_status', 'confirmed')->count(),
-            'shipped' => Order::where('order_status', 'shipped')->count(),
-            'delivered' => Order::where('order_status', 'delivered')->count(),
-            'cancelled' => Order::where('order_status', 'cancelled')->count(),
+            'processing' => Order::where('status', 'processing')->count(),
+            'confirmed' => Order::where('status', 'confirmed')->count(),
+            'shipped' => Order::where('status', 'shipped')->count(),
+            'delivered' => Order::where('status', 'delivered')->count(),
+            'cancelled' => Order::where('status', 'cancelled')->count(),
         ];
         
         return view('admin.orders.index', compact('orders', 'statusCounts'));
@@ -55,28 +55,27 @@ class AdminOrderController extends Controller
     
     public function show(Order $order)
     {
-        $order->load(['user', 'orderItems.product']);
+        $order->load(['user', 'items.product']);
         return view('admin.orders.show', compact('order'));
     }
     
     public function edit(Order $order)
     {
-        $order->load(['user', 'orderItems.product']);
+        $order->load(['user', 'items.product']);
         return view('admin.orders.edit', compact('order'));
     }
     
     public function update(Request $request, Order $order)
     {
         $validated = $request->validate([
-            'order_status' => 'required|in:processing,confirmed,shipped,delivered,cancelled',
+            'status' => 'required|in:processing,confirmed,shipped,delivered,cancelled',
             'payment_status' => 'required|in:pending,completed,failed',
             'notes' => 'nullable|string',
-            'shipping_address' => 'nullable|array',
-            'shipping_address.street' => 'nullable|string',
-            'shipping_address.city' => 'nullable|string',
-            'shipping_address.state' => 'nullable|string',
-            'shipping_address.postal_code' => 'nullable|string',
-            'shipping_address.country' => 'nullable|string',
+            'shipping_address' => 'nullable|string',
+            'shipping_city' => 'nullable|string',
+            'shipping_state' => 'nullable|string',
+            'shipping_postal_code' => 'nullable|string',
+            'shipping_country' => 'nullable|string',
         ]);
         
         $order->update($validated);
@@ -91,7 +90,7 @@ class AdminOrderController extends Controller
             'status' => 'required|in:processing,confirmed,shipped,delivered,cancelled'
         ]);
         
-        $order->update(['order_status' => $validated['status']]);
+        $order->update(['status' => $validated['status']]);
         
         return redirect()->back()->with('success', 'Order status updated successfully.');
     }
@@ -99,7 +98,7 @@ class AdminOrderController extends Controller
     public function destroy(Order $order)
     {
         // Only allow deletion of cancelled orders
-        if ($order->order_status !== 'cancelled') {
+        if ($order->status !== 'cancelled') {
             return redirect()->route('admin.orders.index')
                             ->with('error', 'Only cancelled orders can be deleted.');
         }

@@ -23,6 +23,7 @@ class User extends Authenticatable
         'email_verification_code',
         'email_verification_code_created_at',
         'password_reset_code',
+        'password_reset_code_created_at',
         'registration_date',
         'is_admin_notified',
     ];
@@ -61,6 +62,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'email_verification_code_created_at' => 'datetime',
+            'password_reset_code_created_at' => 'datetime',
             'registration_date' => 'datetime',
             'password' => 'hashed',
             'is_admin_notified' => 'boolean',

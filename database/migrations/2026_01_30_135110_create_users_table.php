@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('email_verification_code', 6)->nullable();
             $table->timestamp('email_verification_code_created_at')->nullable();
             $table->string('password_reset_code', 10)->nullable();
+            $table->timestamp('password_reset_code_created_at')->nullable();
             $table->timestamp('registration_date')->nullable();
             $table->boolean('is_admin_notified')->default(false);
             $table->rememberToken();

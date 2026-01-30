@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Admin Panel') - Electronics Mart</title>
+    <title>@yield('title', 'Admin Panel') - NI Drip Central</title>
     
     <!-- Tailwind CSS and DaisyUI -->
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.6.0/dist/full.min.css" rel="stylesheet" type="text/css" />
@@ -25,27 +25,47 @@
         [x-cloak] { display: none !important; }
         
         :root {
-            --teal-50: #f0fdfa;
-            --teal-100: #ccfbf1;
-            --teal-200: #99f6e4;
-            --teal-300: #5eead4;
-            --teal-400: #2dd4bf;
-            --teal-500: #14b8a6;
-            --teal-600: #01949b;
-            --teal-700: #0f766e;
-            --teal-800: #115e59;
-            --teal-900: #134e4a;
+            --neon-green: #7fff00;
+            --neon-green-light: #9fff33;
+            --neon-green-dark: #66cc00;
+            --gradient-pink: #ff1493;
+            --gradient-blue: #00bfff;
+            --gradient-orange: #ff6600;
+            --gradient-purple: #8a2be2;
             
-            --orange-50: #fff7ed;
-            --orange-100: #ffedd5;
-            --orange-200: #fed7aa;
-            --orange-300: #fdba74;
-            --orange-400: #fb923c;
-            --orange-500: #fe690b;
-            --orange-600: #ea580c;
-            --orange-700: #c2410c;
-            --orange-800: #9a3412;
-            --orange-900: #7c2d12;
+            /* Updated color palette based on logo */
+            --primary-50: #f0fff4;
+            --primary-100: #dcfce7;
+            --primary-200: #bbf7d0;
+            --primary-300: #86efac;
+            --primary-400: #4ade80;
+            --primary-500: #7fff00;
+            --primary-600: #66cc00;
+            --primary-700: #4d9900;
+            --primary-800: #336600;
+            --primary-900: #1a3300;
+            
+            --secondary-50: #fdf2f8;
+            --secondary-100: #fce7f3;
+            --secondary-200: #fbcfe8;
+            --secondary-300: #f9a8d4;
+            --secondary-400: #f472b6;
+            --secondary-500: #ff1493;
+            --secondary-600: #db2777;
+            --secondary-700: #be185d;
+            --secondary-800: #9d174d;
+            --secondary-900: #831843;
+            
+            --accent-50: #eff6ff;
+            --accent-100: #dbeafe;
+            --accent-200: #bfdbfe;
+            --accent-300: #93c5fd;
+            --accent-400: #60a5fa;
+            --accent-500: #00bfff;
+            --accent-600: #2563eb;
+            --accent-700: #1d4ed8;
+            --accent-800: #1e40af;
+            --accent-900: #1e3a8a;
         }
         
         body {
@@ -59,6 +79,7 @@
         
         .sidebar-gradient {
             background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-right: 2px solid var(--neon-green);
         }
         
         .card-shadow {
@@ -69,18 +90,22 @@
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
         
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--neon-green) 0%, var(--neon-green-dark) 100%);
+            color: black;
+            box-shadow: 0 4px 12px rgba(127, 255, 0, 0.3);
+            font-weight: 700;
+        }
+        
         .nav-item {
+            color: #374151;
             transition: all 0.2s ease-in-out;
         }
         
-        .nav-item:hover {
+        .nav-item:hover:not(.active) {
+            background: rgba(127, 255, 0, 0.1);
+            color: var(--neon-green-dark);
             transform: translateX(4px);
-        }
-        
-        .nav-item.active {
-            background: linear-gradient(135deg, #01949b 0%, #0f766e 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(1, 148, 155, 0.3);
         }
         
         .stat-card {
@@ -142,11 +167,16 @@
             <!-- Logo -->
             <div class="flex items-center justify-between h-16 px-6 border-b border-gray-200">
                 <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-gradient-to-br from-teal-500 to-teal-700 rounded-lg flex items-center justify-center">
-                        <i data-lucide="zap" class="w-5 h-5 text-white"></i>
+                    <!-- NI Drip Central Logo -->
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center relative overflow-hidden">
+                        <!-- Gradient background mimicking the logo -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-pink-500 via-blue-500 to-orange-500 rounded-lg"></div>
+                        <div class="relative z-10 w-6 h-6 bg-white rounded-sm flex items-center justify-center">
+                            <span class="text-black font-bold text-xs">N</span>
+                        </div>
                     </div>
                     <div>
-                        <h2 class="text-lg font-bold text-gray-900">Electronics Mart</h2>
+                        <h2 class="text-lg font-bold text-gray-900">NI Drip Central</h2>
                         <p class="text-xs text-gray-500 font-medium">Admin Panel</p>
                     </div>
                 </div>
@@ -161,7 +191,7 @@
             <!-- Navigation -->
             <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
                 <a href="{{ route('admin.dashboard') }}" 
-                   class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl {{ request()->routeIs('admin.dashboard*') ? 'active' : 'text-gray-700 hover:bg-gray-100' }}">
+                   class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl {{ request()->routeIs('admin.dashboard*') ? 'active' : '' }}">
                     <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3"></i>
                     Dashboard
                 </a>
@@ -172,7 +202,7 @@
                     </div>
                     
                     <a href="{{ route('admin.products.index') }}" 
-                       class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl {{ request()->routeIs('admin.products.*') ? 'active' : 'text-gray-700 hover:bg-gray-100' }}">
+                       class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
                         <i data-lucide="package" class="w-5 h-5 mr-3"></i>
                         Products
                         @php
@@ -182,7 +212,7 @@
                     </a>
                     
                     <a href="{{ route('admin.categories.index') }}" 
-                       class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl {{ request()->routeIs('admin.categories.*') ? 'active' : 'text-gray-700 hover:bg-gray-100' }}">
+                       class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
                         <i data-lucide="tags" class="w-5 h-5 mr-3"></i>
                         Categories
                         @php
@@ -198,19 +228,19 @@
                     </div>
                     
                     <a href="{{ route('admin.orders.index') }}" 
-                       class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl {{ request()->routeIs('admin.orders.*') ? 'active' : 'text-gray-700 hover:bg-gray-100' }}">
+                       class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
                         <i data-lucide="shopping-cart" class="w-5 h-5 mr-3"></i>
                         Orders
                         @php
-                            $pendingOrders = \App\Models\Order::where('order_status', 'processing')->count();
+                            $pendingOrders = \App\Models\Order::where('status', 'processing')->count();
                         @endphp
                         @if($pendingOrders > 0)
-                            <span class="ml-auto bg-orange-100 text-orange-600 text-xs px-2 py-1 rounded-full">{{ $pendingOrders }}</span>
+                            <span class="ml-auto bg-gradient-to-r from-pink-500 to-orange-500 text-white text-xs px-2 py-1 rounded-full">{{ $pendingOrders }}</span>
                         @endif
                     </a>
                     
                     <a href="#" 
-                       class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl text-gray-700 hover:bg-gray-100">
+                       class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl">
                         <i data-lucide="users" class="w-5 h-5 mr-3"></i>
                         Customers
                     </a>
@@ -222,53 +252,44 @@
                     </div>
                     
                     <a href="#" 
-                       class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl text-gray-700 hover:bg-gray-100">
+                       class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl">
                         <i data-lucide="bar-chart-3" class="w-5 h-5 mr-3"></i>
                         Reports
                     </a>
                     
                     <a href="#" 
-                       class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl text-gray-700 hover:bg-gray-100">
+                       class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl">
                         <i data-lucide="trending-up" class="w-5 h-5 mr-3"></i>
                         Analytics
                     </a>
                 </div>
                 
-                <div class="pt-6 border-t border-gray-200">
+                <div class="pt-6 border-t border-gray-200 space-y-2">
                     <a href="{{ route('admin.settings.index') }}" 
-                       class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl {{ request()->routeIs('admin.settings.*') ? 'active' : 'text-gray-700 hover:bg-gray-100' }}">
+                       class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                         <i data-lucide="settings" class="w-5 h-5 mr-3"></i>
                         Settings
                     </a>
+                    
+                    <form method="POST" action="{{ route('admin.logout') }}" class="w-full">
+                        @csrf
+                        <button type="submit" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl w-full text-left hover:bg-red-50 hover:text-red-600 transition-colors">
+                            <i data-lucide="log-out" class="w-5 h-5 mr-3"></i>
+                            Logout
+                        </button>
+                    </form>
                 </div>
             </nav>
             
-            <!-- User Profile -->
+            <!-- Admin Info -->
             <div class="p-4 border-t border-gray-200">
                 <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-gradient-to-br from-teal-500 to-teal-700 rounded-full flex items-center justify-center">
+                    <div class="w-8 h-8 bg-gradient-to-br from-pink-500 via-blue-500 to-orange-500 rounded-full flex items-center justify-center">
                         <i data-lucide="user" class="w-4 h-4 text-white"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-gray-900 truncate">Admin User</p>
-                        <p class="text-xs text-gray-500 truncate">admin@electronicsmart.com</p>
-                    </div>
-                    <div class="dropdown dropdown-top dropdown-end">
-                        <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle">
-                            <i data-lucide="more-vertical" class="w-4 h-4"></i>
-                        </div>
-                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-lg bg-white rounded-xl w-52 border border-gray-200">
-                            <li><a href="#" class="text-sm"><i data-lucide="user" class="w-4 h-4 mr-2"></i>Profile</a></li>
-                            <li><a href="#" class="text-sm"><i data-lucide="settings" class="w-4 h-4 mr-2"></i>Settings</a></li>
-                            <li class="border-t border-gray-100 mt-1 pt-1">
-                                <form method="POST" action="{{ route('admin.logout') }}">
-                                    @csrf
-                                    <button type="submit" class="w-full text-left text-sm text-red-600 hover:bg-red-50">
-                                        <i data-lucide="log-out" class="w-4 h-4 mr-2"></i>Logout
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
+                        <p class="text-sm font-medium text-gray-900 truncate">{{ auth()->user()->name ?? 'Admin User' }}</p>
+                        <p class="text-xs text-gray-500 truncate">{{ auth()->user()->email ?? 'admin@nidripcentral.com' }}</p>
                     </div>
                 </div>
             </div>
@@ -298,7 +319,7 @@
                             <div tabindex="0" role="button" class="btn btn-ghost btn-circle relative">
                                 <i data-lucide="bell" class="w-5 h-5"></i>
                                 @php
-                                    $pendingOrdersCount = \App\Models\Order::where('order_status', 'processing')->count();
+                                    $pendingOrdersCount = \App\Models\Order::where('status', 'processing')->count();
                                 @endphp
                                 @if($pendingOrdersCount > 0)
                                     <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
@@ -315,7 +336,7 @@
                         </div>
                         
                         <!-- Quick actions -->
-                        <button class="btn btn-sm bg-gradient-to-r from-teal-500 to-teal-700 text-white border-none hover:from-teal-600 hover:to-teal-800">
+                        <button class="btn btn-sm bg-gradient-to-r from-lime-400 to-lime-600 text-black border-none hover:from-lime-500 hover:to-lime-700 font-bold">
                             <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
                             Add Product
                         </button>

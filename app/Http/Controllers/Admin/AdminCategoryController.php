@@ -4,11 +4,19 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Services\LocalImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class AdminCategoryController extends Controller
 {
+    protected $imageService;
+
+    public function __construct(LocalImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     public function index(Request $request)
     {
         $query = Category::query();
@@ -42,11 +50,29 @@ class AdminCategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:categories,name',
             'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_active' => 'boolean'
         ]);
         
         // Generate slug from name
         $validated['slug'] = Str::slug($validated['name']);
+        
+        // Handle image upload using LocalImageService
+        if ($request->hasFile('image')) {
+            $uploadResult = $this->imageService->uploadImage(
+                $request->file('image'), 
+                'categories', 
+                null, 
+                ['max_width' => 800, 'max_height' => 800, 'quality' => 85]
+            );
+            
+            if ($uploadResult) {
+                $validated['image_url'] = $uploadResult['secure_url'];
+            }
+        }
+        
+        // Remove image from validated data since we use image_url
+        unset($validated['image']);
         
         Category::create($validated);
         
@@ -70,6 +96,7 @@ class AdminCategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
             'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_active' => 'boolean'
         ]);
         
@@ -77,6 +104,28 @@ class AdminCategoryController extends Controller
         if ($validated['name'] !== $category->name) {
             $validated['slug'] = Str::slug($validated['name']);
         }
+        
+        // Handle image upload using LocalImageService
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($category->image_url) {
+                $this->imageService->deleteImage($category->image_url);
+            }
+            
+            $uploadResult = $this->imageService->uploadImage(
+                $request->file('image'), 
+                'categories', 
+                null, 
+                ['max_width' => 800, 'max_height' => 800, 'quality' => 85]
+            );
+            
+            if ($uploadResult) {
+                $validated['image_url'] = $uploadResult['secure_url'];
+            }
+        }
+        
+        // Remove image from validated data since we use image_url
+        unset($validated['image']);
         
         $category->update($validated);
         

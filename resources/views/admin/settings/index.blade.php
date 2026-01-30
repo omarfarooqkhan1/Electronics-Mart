@@ -152,8 +152,8 @@
                         <input
                             type="text"
                             name="site_name"
-                            value="{{ old('site_name', 'Electronics Mart') }}"
-                            placeholder="Electronics Mart"
+                            value="{{ old('site_name', 'NI Drip Central') }}"
+                            placeholder="NI Drip Central"
                             class="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all @error('site_name') border-red-300 @enderror"
                             required
                         />
@@ -167,8 +167,8 @@
                         <input
                             type="email"
                             name="contact_email"
-                            value="{{ old('contact_email', 'contact@electronicsmart.com') }}"
-                            placeholder="contact@electronicsmart.com"
+                            value="{{ old('contact_email', 'contact@nidripcentral.com') }}"
+                            placeholder="contact@nidripcentral.com"
                             class="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all @error('contact_email') border-red-300 @enderror"
                             required
                         />
@@ -230,9 +230,9 @@
                     <textarea
                         name="site_description"
                         rows="3"
-                        placeholder="Premium electronics and appliances for modern homes"
+                        placeholder="Premium streetwear and fashion for the modern lifestyle"
                         class="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 transition-all resize-none @error('site_description') border-red-300 @enderror"
-                    >{{ old('site_description', 'Premium electronics and appliances for modern homes') }}</textarea>
+                    >{{ old('site_description', 'Premium streetwear and fashion for the modern lifestyle') }}</textarea>
                     @error('site_description')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
@@ -243,9 +243,9 @@
                     <textarea
                         name="address"
                         rows="3"
-                        placeholder="123 Electronics Street, Berlin, Germany"
+                        placeholder="123 Fashion Street, Berlin, Germany"
                         class="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 transition-all resize-none @error('address') border-red-300 @enderror"
-                    >{{ old('address', '123 Electronics Street, Berlin, Germany') }}</textarea>
+                    >{{ old('address', '123 Fashion Street, Berlin, Germany') }}</textarea>
                     @error('address')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror

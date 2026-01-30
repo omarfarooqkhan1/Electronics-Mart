@@ -268,7 +268,9 @@
                         @endif
                         <div class="item-details">
                             <div class="item-name">{{ $item->product_name }}</div>
-                            <div class="item-variant">{{ $item->variant_name }}</div>
+                            @if(isset($item->product_snapshot['brand']))
+                            <div class="item-variant">Brand: {{ $item->product_snapshot['brand'] }}</div>
+                            @endif
                             <div class="item-quantity">Quantity: {{ $item->quantity }}</div>
                         </div>
                     </div>

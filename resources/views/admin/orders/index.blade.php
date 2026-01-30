@@ -137,7 +137,7 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">
-                                    €{{ number_format($order->total_amount, 2) }}
+                                    €{{ number_format($order->total, 2) }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @php
@@ -149,8 +149,8 @@
                                             'cancelled' => 'bg-red-100 text-red-800',
                                         ];
                                     @endphp
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold {{ $statusColors[$order->order_status] ?? 'bg-gray-100 text-gray-800' }}">
-                                        {{ ucfirst($order->order_status) }}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold {{ $statusColors[$order->status] ?? 'bg-gray-100 text-gray-800' }}">
+                                        {{ ucfirst($order->status) }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">

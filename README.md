@@ -1,346 +1,327 @@
-# Electronics Mart - Laravel Backend
+# NI Drip Central - E-commerce Platform
 
-Modern Laravel API backend for Electronics Mart e-commerce platform with authentication-only access.
+A modern, full-featured e-commerce platform built with Laravel 11, featuring a comprehensive admin panel and RESTful API for managing products, orders, and customers.
+
+## 🚀 Features
+
+### Admin Panel
+- **Modern Dashboard** with real-time statistics and analytics
+- **Product Management** with image uploads, specifications, and inventory tracking
+- **Category Management** with hierarchical organization
+- **Order Management** with 5-state workflow (processing → confirmed → shipped → delivered → cancelled)
+- **Customer Management** with detailed profiles and order history
+- **Settings Panel** for system configuration
+- **Authentication** with secure login and password reset
+
+### API Features
+- **RESTful API** with comprehensive endpoints
+- **JWT Authentication** using Laravel Sanctum
+- **Product Catalog** with search, filtering, and pagination
+- **Shopping Cart** with persistent storage
+- **Order Processing** with email notifications
+- **User Management** with email verification
+
+### Technical Features
+- **Database Flexibility** - SQLite (development) and MySQL (production) support
+- **Email Testing** with Mailpit integration
+- **Docker Support** for easy development setup
+- **Modern UI** with Tailwind CSS and responsive design
+- **File Storage** with Laravel's storage system
+- **Comprehensive Validation** and error handling
+
+## 🛠 Technology Stack
+
+- **Backend**: Laravel 11 (PHP 8.3+)
+- **Database**: SQLite (dev) / MySQL 8.0 (prod)
+- **Frontend**: Blade Templates, Tailwind CSS, Alpine.js
+- **Icons**: Lucide Icons
+- **Email**: Mailpit (development)
+- **Authentication**: Laravel Sanctum
+- **File Storage**: Laravel Storage
+- **Development**: Docker Compose
+
+## 📋 Requirements
+
+- PHP 8.3 or higher
+- Composer
+- Node.js & NPM
+- SQLite (default) or MySQL
+- Docker & Docker Compose (optional)
 
 ## 🚀 Quick Start
 
-```bash
-# Install dependencies
-composer install
+### Option 1: Standard Setup (SQLite)
 
-# Configure environment
-cp .env.example .env
+1. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd ni-drip-central
+   ```
 
-# Generate application key
-php artisan key:generate
+2. **Install dependencies**:
+   ```bash
+   composer install
+   npm install
+   ```
 
-# Create SQLite database
-touch database/database.sqlite
+3. **Environment setup**:
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-# Run migrations and seed data
-php artisan migrate --seed
+4. **Database setup**:
+   ```bash
+   touch database/database.sqlite
+   php artisan migrate --seed
+   ```
 
-# Start development server
-php artisan serve
-```
+5. **Storage setup**:
+   ```bash
+   php artisan storage:link
+   ```
 
-The API will be available at `http://localhost:8000`
+6. **Start development server**:
+   ```bash
+   php artisan serve
+   npm run dev
+   ```
 
-## 🛠️ Tech Stack
+### Option 2: Docker Setup (MySQL + Mailpit)
 
-- **Laravel 11** with PHP 8.2+
-- **SQLite** database (default) / MySQL (optional)
-- **Laravel Sanctum** for API authentication
-- **Laravel Mail** with Mailpit for development
-- **Local File Storage** for product images
-- **Modern Admin Dashboard** with Tailwind CSS + DaisyUI
+1. **Start Docker services**:
+   ```bash
+   docker-compose up -d
+   ```
 
-## 🧩 Key Features
+2. **Update environment**:
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+   
+   Then uncomment MySQL configuration in `.env` and comment out SQLite.
 
-### Core Functionality
-- **Authentication-Only API** - All endpoints require user authentication
-- **Product Management** - Electronics catalog with categories and brands
-- **Shopping Cart** - Persistent cart with price preservation
-- **Order Management** - 5-state order system (processing → confirmed → shipped → delivered → cancelled)
-- **Admin Dashboard** - Modern web interface for store management
+3. **Run migrations**:
+   ```bash
+   php artisan migrate --seed
+   ```
 
-### Technical Features
-- **JWT Authentication** with Laravel Sanctum
-- **Price Preservation** - Cart and order prices locked at time of addition
-- **Tax-Inclusive Pricing** - Simplified European-style pricing
-- **Free Shipping** - No shipping calculations required
-- **Email Notifications** - Order confirmations and updates
-- **Modern UI** - Responsive admin dashboard with Tailwind CSS
+4. **Start Laravel**:
+   ```bash
+   php artisan serve
+   ```
 
-## 🔧 Environment Configuration
+## 🔧 Configuration
 
-### Database (SQLite - Default)
+### Database Configuration
+
+**SQLite (Default)**:
 ```env
 DB_CONNECTION=sqlite
 DB_DATABASE=database/database.sqlite
 ```
 
-### Database (MySQL - Alternative)
+**MySQL (Docker)**:
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=electronics_mart
-DB_USERNAME=your_username
-DB_PASSWORD=your_password
+DB_DATABASE=ni_drip_central
+DB_USERNAME=ni_drip_user
+DB_PASSWORD=ni_drip_password
 ```
 
-### Mail Configuration (Development)
+### Email Configuration
+
+**Development (Mailpit)**:
 ```env
 MAIL_MAILER=smtp
 MAIL_HOST=127.0.0.1
 MAIL_PORT=1025
-MAIL_FROM_ADDRESS="noreply@electronicsmart.com"
-MAIL_FROM_NAME="Electronics Mart"
+MAIL_FROM_ADDRESS="noreply@nidripcentral.com"
+MAIL_FROM_NAME="NI Drip Central"
 ```
 
-### Application Settings
-```env
-APP_NAME="Electronics Mart"
-APP_URL=http://localhost:8000
-APP_TIMEZONE=UTC
-CURRENCY=EUR
-```
+## 🏗 Architecture
 
-## 📦 Installation Guide
+### Database Schema
 
-### 1. Clone and Install
-```bash
-git clone <repository-url>
-cd electronics-mart-backend
-composer install
-```
+**Core Entities**:
+- `users` - Customer and admin accounts
+- `categories` - Product categories with hierarchical support
+- `products` - Product catalog with specifications and pricing
+- `images` - Polymorphic image storage
+- `orders` - Order management with 5-state workflow
+- `order_items` - Order line items with pricing snapshots
+- `carts` - Shopping cart persistence
+- `cart_items` - Cart line items
+- `addresses` - Customer shipping addresses
 
-### 2. Environment Setup
-```bash
-# Copy environment file
-cp .env.example .env
+### API Endpoints
 
-# Generate application key
-php artisan key:generate
-```
-
-### 3. Database Setup (SQLite)
-```bash
-# Create SQLite database file
-touch database/database.sqlite
-
-# Run migrations and seed sample data
-php artisan migrate --seed
-```
-
-### 4. Alternative Database Setup (MySQL)
-If you prefer MySQL, update your `.env` file:
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=electronics_mart
-DB_USERNAME=root
-DB_PASSWORD=your_password
-```
-
-Then run:
-```bash
-php artisan migrate --seed
-```
-
-### 5. Start Development Server
-```bash
-php artisan serve
-```
-
-## 🏗️ Development Commands
-
-```bash
-# Database operations
-php artisan migrate              # Run migrations
-php artisan migrate:fresh --seed # Fresh database with sample data
-php artisan db:seed             # Seed sample data only
-
-# Cache management
-php artisan cache:clear         # Clear application cache
-php artisan config:clear        # Clear configuration cache
-php artisan view:clear          # Clear compiled views
-
-# Development tools
-php artisan route:list          # List all routes
-php artisan tinker             # Interactive shell
-```
-
-## 🗂️ Project Structure
-
-```
-app/
-├── Http/Controllers/
-│   ├── Api/                   # API controllers
-│   └── Admin/                 # Admin dashboard controllers
-├── Models/                    # Eloquent models
-├── Mail/                      # Email templates
-└── Http/Resources/            # API resources
-
-database/
-├── migrations/                # Database schema
-├── seeders/                   # Sample data
-└── database.sqlite           # SQLite database file
-
-resources/views/admin/         # Admin dashboard views
-routes/
-├── api.php                   # API routes
-└── web.php                   # Web routes (admin)
-```
-
-## 🔌 API Endpoints
-
-### Authentication
+**Authentication**:
 - `POST /api/register` - User registration
 - `POST /api/login` - User login
-- `GET /api/user` - Get authenticated user
 - `POST /api/logout` - User logout
+- `POST /api/verify-email` - Email verification
 
-### Products (Authenticated)
-- `GET /api/products` - List products with filters
+**Products**:
+- `GET /api/products` - List products with filtering
 - `GET /api/products/{id}` - Get product details
-- `GET /api/products/brands` - Get available brands
 - `GET /api/categories` - List categories
 
-### Shopping Cart (Authenticated)
-- `GET /api/cart` - Get cart contents
-- `POST /api/cart` - Add item to cart
-- `PUT /api/cart/{id}` - Update cart item
-- `DELETE /api/cart/{id}` - Remove cart item
-- `DELETE /api/cart` - Clear cart
-
-### Orders (Authenticated)
+**Cart & Orders**:
+- `GET /api/cart` - Get user's cart
+- `POST /api/cart/add` - Add item to cart
+- `PUT /api/cart/update/{id}` - Update cart item
+- `DELETE /api/cart/remove/{id}` - Remove cart item
+- `POST /api/orders` - Create order
 - `GET /api/orders` - List user orders
-- `POST /api/orders` - Create order (checkout)
 - `GET /api/orders/{id}` - Get order details
-- `POST /api/orders/validate-checkout` - Validate cart before checkout
 
-### Admin Dashboard (Web)
-- `/admin/login` - Admin login
-- `/admin/dashboard` - Dashboard overview
-- `/admin/products` - Product management
-- `/admin/categories` - Category management
-- `/admin/orders` - Order management
-- `/admin/settings` - System settings
+### Admin Panel Structure
 
-## 🔒 Authentication
+**Dashboard** (`/admin`):
+- Real-time statistics
+- Recent orders and activities
+- Quick actions
 
-All API endpoints (except registration and login) require authentication using Laravel Sanctum tokens:
+**Product Management** (`/admin/products`):
+- Product listing with search and filters
+- Create/edit products with image uploads
+- Inventory management
+- Brand selection with predefined options
 
-```bash
-# Login to get token
-curl -X POST http://localhost:8000/api/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"customer@example.com","password":"password123"}'
+**Order Management** (`/admin/orders`):
+- Order listing with status filters
+- Order details and status updates
+- Customer information
+- Order timeline tracking
 
-# Use token in subsequent requests
-curl -X GET http://localhost:8000/api/products \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE"
-```
+**Category Management** (`/admin/categories`):
+- Category listing and management
+- Create/edit categories
+- Category activation/deactivation
 
-## 🛒 Sample Data
+**Settings** (`/admin/settings`):
+- Admin profile management
+- System configuration
+- Email settings
 
-The application includes comprehensive sample data:
+## 🎨 UI/UX Features
 
-### Categories
-- Refrigerators, Air Conditioners, Washing Machines
-- Televisions, Microwaves, Dishwashers
-- Water Heaters, Small Appliances
+### Modern Design
+- **Responsive Layout** - Mobile-first design
+- **Dark/Light Theme** - Consistent color scheme
+- **Smooth Animations** - CSS transitions and transforms
+- **Interactive Elements** - Hover effects and loading states
 
-### Products
-- 12+ sample electronics products with realistic pricing in EUR
-- Product images, specifications, and brand information
-- Featured products and stock quantities
+### User Experience
+- **Auto-filtering** - Real-time search and filter application
+- **Password Toggle** - Show/hide password functionality
+- **Direct Actions** - Quick logout and action buttons
+- **Form Validation** - Real-time validation with error messages
 
-### Users
-- **Admin**: `admin@electronicsmart.com` / `password123`
-- **Customer**: `customer@example.com` / `password123`
+### Brand Identity
+- **NI Drip Central Branding** - Consistent logo and colors
+- **Gradient Accents** - Modern gradient color scheme
+- **Professional Typography** - Inter and Playfair Display fonts
 
-## 💰 Pricing System
+## 🔐 Security Features
 
-- **Tax-Inclusive Pricing** - All prices include VAT/tax
-- **Euro Currency** - Prices displayed in EUR (€)
-- **Free Shipping** - No shipping costs calculated
-- **Price Preservation** - Cart and order prices locked when items added
+- **CSRF Protection** - All forms protected
+- **SQL Injection Prevention** - Eloquent ORM usage
+- **XSS Protection** - Input sanitization
+- **Authentication** - Secure login with rate limiting
+- **Authorization** - Role-based access control
+- **Password Hashing** - Bcrypt encryption
 
 ## 📧 Email System
 
-Development email testing with Mailpit:
+### Development
+- **Mailpit Integration** - Local email testing
+- **Web Interface** - http://localhost:8025
+- **SMTP Server** - Port 1025
 
-1. **Install Mailpit** (optional):
-   ```bash
-   # macOS
-   brew install mailpit
-   
-   # Or download from https://github.com/axllent/mailpit
-   ```
+### Email Templates
+- Order confirmation emails
+- Order status updates
+- Email verification
+- Password reset notifications
 
-2. **Start Mailpit**:
-   ```bash
-   mailpit
-   ```
+## 🐳 Docker Services
 
-3. **View emails** at `http://localhost:8025`
+### MySQL Database
+- **Container**: ni_drip_central_mysql
+- **Port**: 3306
+- **Persistent Storage**: Docker volume
 
-## 🎨 Admin Dashboard
+### Mailpit
+- **Container**: ni_drip_central_mailpit
+- **SMTP Port**: 1025
+- **Web UI**: http://localhost:8025
 
-Modern admin interface built with:
-- **Tailwind CSS** - Utility-first CSS framework
-- **DaisyUI** - Component library
-- **Alpine.js** - Lightweight JavaScript framework
-- **Lucide Icons** - Beautiful icon set
+## 🧪 Testing
 
-Features:
-- Responsive design for all devices
-- Dark/light theme support
-- Real-time statistics
-- Intuitive product and order management
+Run the test suite:
+```bash
+php artisan test
+```
 
-## 🧪 Testing the API
+## 📝 API Documentation
 
-Use the included Postman collection (`Electronics Mart API Collection.json`):
+The API follows RESTful conventions with JSON responses. All authenticated endpoints require a Bearer token obtained from the login endpoint.
 
-1. Import the collection into Postman
-2. Set the base URL to `http://localhost:8001/api` (or your server URL)
-3. Use the "Customer Login" request to authenticate
-4. Test other endpoints with automatic token management
+### Authentication Flow
+1. Register or login to get access token
+2. Include token in Authorization header: `Bearer {token}`
+3. Access protected endpoints
 
-## 🚀 Production Deployment
+### Response Format
+```json
+{
+    "success": true,
+    "data": {},
+    "message": "Success message"
+}
+```
+
+## 🚀 Deployment
+
+### Production Setup
+1. Set `APP_ENV=production` in `.env`
+2. Configure production database
+3. Set up proper mail configuration
+4. Run `php artisan config:cache`
+5. Run `php artisan route:cache`
+6. Run `php artisan view:cache`
 
 ### Environment Variables
-```env
-APP_ENV=production
-APP_DEBUG=false
-APP_URL=https://your-domain.com
-
-# Use MySQL/PostgreSQL for production
-DB_CONNECTION=mysql
-DB_HOST=your-db-host
-DB_DATABASE=your-db-name
-DB_USERNAME=your-db-user
-DB_PASSWORD=your-secure-password
-
-# Configure production mail service
-MAIL_MAILER=smtp
-MAIL_HOST=your-smtp-host
-MAIL_PORT=587
-MAIL_USERNAME=your-smtp-user
-MAIL_PASSWORD=your-smtp-password
-```
-
-### Deployment Commands
-```bash
-# Optimize for production
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-
-# Run migrations
-php artisan migrate --force
-
-# Set proper permissions
-chmod -R 755 storage bootstrap/cache
-```
+- Set strong `APP_KEY`
+- Configure production database
+- Set up email service (SMTP/SES)
+- Configure file storage (S3/local)
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Run tests
+5. Submit a pull request
 
 ## 📄 License
 
-This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](LICENSE).
+
+## 🆘 Support
+
+For support and questions:
+- Create an issue on GitHub
+- Check the documentation
+- Review the API endpoints
 
 ---
 
-**Electronics Mart** - Modern e-commerce platform built with Laravel 11
+**NI Drip Central** - Modern E-commerce Platform © 2024

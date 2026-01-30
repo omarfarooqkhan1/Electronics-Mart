@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Admin Login - Electronics Mart</title>
+    <title>Forgot Password - Electronics Mart</title>
     
     <!-- Tailwind CSS and DaisyUI -->
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.6.0/dist/full.min.css" rel="stylesheet" type="text/css" />
@@ -124,8 +124,15 @@
                     <img src="{{ asset('storage/logo.png') }}" alt="Electronics Mart Logo" class="w-full h-full object-contain">
                 </div>
                 <h1 class="text-3xl font-bold text-gray-900 mb-2">Electronics Mart</h1>
-                <p class="text-gray-500 font-medium">Admin Panel Access</p>
+                <p class="text-gray-500 font-medium">Reset your password</p>
             </div>
+            
+            @if(session('status'))
+                <div class="alert alert-success mb-6 rounded-xl">
+                    <i data-lucide="check-circle" class="w-5 h-5"></i>
+                    <span>{{ session('status') }}</span>
+                </div>
+            @endif
             
             @if(session('error'))
                 <div class="alert alert-error mb-6 rounded-xl">
@@ -134,8 +141,8 @@
                 </div>
             @endif
             
-            <!-- Login Form -->
-            <form method="POST" action="{{ route('admin.login') }}" class="space-y-6">
+            <!-- Reset Form -->
+            <form method="POST" action="#" class="space-y-6">
                 @csrf
                 
                 <div class="space-y-2">
@@ -150,7 +157,7 @@
                             type="email" 
                             name="email" 
                             value="{{ old('email') }}"
-                            placeholder="admin@nidripcentral.com" 
+                            placeholder="admin@electronicsmart.com" 
                             class="input-field w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white @error('email') border-red-300 @enderror" 
                             required 
                             autofocus
@@ -161,62 +168,30 @@
                     @enderror
                 </div>
                 
-                <div class="space-y-2">
-                    <label class="block text-sm font-semibold text-gray-700">
-                        Password
-                    </label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i data-lucide="lock" class="w-5 h-5 text-gray-400"></i>
-                        </div>
-                        <input 
-                            type="password" 
-                            id="password"
-                            name="password" 
-                            placeholder="Enter your password" 
-                            class="input-field w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white @error('password') border-red-300 @enderror" 
-                            required
-                        />
-                        <button 
-                            type="button" 
-                            id="togglePassword"
-                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
-                        >
-                            <i data-lucide="eye" id="eyeIcon" class="w-5 h-5"></i>
-                        </button>
-                    </div>
-                    @error('password')
-                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-                
-                <div class="flex items-center justify-between">
-                    <label class="flex items-center">
-                        <input type="checkbox" name="remember" class="checkbox checkbox-sm checkbox-primary">
-                        <span class="ml-2 text-sm text-gray-600">Remember me</span>
-                    </label>
-                    <a href="{{ route('admin.forgot-password') }}" class="text-sm text-teal-600 hover:text-teal-700 font-medium">
-                        Forgot password?
-                    </a>
-                </div>
-                
                 <button type="submit" class="btn-primary w-full py-3 px-4 font-semibold rounded-xl flex items-center justify-center space-x-2">
-                    <i data-lucide="log-in" class="w-5 h-5"></i>
-                    <span>Sign In to Dashboard</span>
+                    <i data-lucide="send" class="w-5 h-5"></i>
+                    <span>Send Reset Instructions</span>
                 </button>
             </form>
             
-            <!-- Demo Credentials -->
+            <!-- Back to Login -->
+            <div class="mt-6 text-center">
+                <a href="{{ route('admin.login') }}" class="text-sm text-teal-600 hover:text-teal-700 font-medium inline-flex items-center space-x-1">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span>Back to Login</span>
+                </a>
+            </div>
+            
+            <!-- Info -->
             <div class="mt-8 pt-6 border-t border-gray-200">
                 <div class="bg-gradient-to-r from-blue-50 to-teal-50 border border-blue-200 rounded-xl p-4">
                     <div class="flex items-center space-x-2 mb-2">
                         <i data-lucide="info" class="w-4 h-4 text-blue-600"></i>
-                        <h4 class="text-sm font-semibold text-blue-900">Demo Credentials</h4>
+                        <h4 class="text-sm font-semibold text-blue-900">Password Reset</h4>
                     </div>
-                    <div class="text-sm text-blue-800 space-y-1">
-                        <p><span class="font-medium">Email:</span> admin@electronicsmart.com</p>
-                        <p><span class="font-medium">Password:</span> admin123</p>
-                    </div>
+                    <p class="text-sm text-blue-800">
+                        If you don't receive an email within a few minutes, please contact your system administrator.
+                    </p>
                 </div>
             </div>
         </div>
@@ -232,23 +207,6 @@
     <script>
         // Initialize Lucide icons
         lucide.createIcons();
-        
-        // Password toggle functionality
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('password');
-            const eyeIcon = document.getElementById('eyeIcon');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                eyeIcon.setAttribute('data-lucide', 'eye-off');
-            } else {
-                passwordInput.type = 'password';
-                eyeIcon.setAttribute('data-lucide', 'eye');
-            }
-            
-            // Re-initialize Lucide icons to update the icon
-            lucide.createIcons();
-        });
     </script>
 </body>
 </html>

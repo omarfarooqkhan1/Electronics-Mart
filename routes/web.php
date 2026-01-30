@@ -50,7 +50,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Admin Authentication Routes
     Route::get('login', [AdminAuthController::class, 'showLogin'])->name('login');
     Route::post('login', [AdminAuthController::class, 'login']);
-    Route::post('logout', [AdminAuthController::class, 'logout'])->name('logout');
+    Route::get('forgot-password', [AdminAuthController::class, 'showForgotPassword'])->name('forgot-password');
+    Route::match(['GET', 'POST'], 'logout', [AdminAuthController::class, 'logout'])->name('logout');
     
     // Protected Admin Routes
     Route::middleware(['auth', 'admin'])->group(function () {
@@ -116,5 +117,15 @@ Route::get('/', function () {
 
 // Catch-all for any other routes (404)
 Route::fallback(function () {
+    // If it's an API request, return JSON 404
+    if (request()->is('api/*') || request()->expectsJson()) {
+        return response()->json([
+            'message' => 'Endpoint not found.',
+            'status' => 'error',
+            'code' => 'ENDPOINT_NOT_FOUND'
+        ], 404);
+    }
+    
+    // For web requests, show 404 page
     return response()->view('errors.404', [], 404);
 });

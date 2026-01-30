@@ -35,17 +35,17 @@
                 <div class="space-y-1.5">
                     <label class="text-xs font-bold uppercase text-gray-400">Order Status *</label>
                     <select
-                        name="order_status"
-                        class="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 transition-all font-medium @error('order_status') border-red-300 @enderror"
+                        name="status"
+                        class="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 transition-all font-medium @error('status') border-red-300 @enderror"
                         required
                     >
-                        <option value="processing" {{ old('order_status', $order->order_status) === 'processing' ? 'selected' : '' }}>Processing</option>
-                        <option value="confirmed" {{ old('order_status', $order->order_status) === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                        <option value="shipped" {{ old('order_status', $order->order_status) === 'shipped' ? 'selected' : '' }}>Shipped</option>
-                        <option value="delivered" {{ old('order_status', $order->order_status) === 'delivered' ? 'selected' : '' }}>Delivered</option>
-                        <option value="cancelled" {{ old('order_status', $order->order_status) === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                        <option value="processing" {{ old('status', $order->status) === 'processing' ? 'selected' : '' }}>Processing</option>
+                        <option value="confirmed" {{ old('status', $order->status) === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
+                        <option value="shipped" {{ old('status', $order->status) === 'shipped' ? 'selected' : '' }}>Shipped</option>
+                        <option value="delivered" {{ old('status', $order->status) === 'delivered' ? 'selected' : '' }}>Delivered</option>
+                        <option value="cancelled" {{ old('status', $order->status) === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                     </select>
-                    @error('order_status')
+                    @error('status')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -80,12 +80,12 @@
                     <label class="text-xs font-bold uppercase text-gray-400">Street Address</label>
                     <input
                         type="text"
-                        name="shipping_address[street]"
-                        value="{{ old('shipping_address.street', $order->shipping_address['street'] ?? '') }}"
+                        name="shipping_address"
+                        value="{{ old('shipping_address', $order->shipping_address) }}"
                         placeholder="123 Main Street"
-                        class="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all @error('shipping_address.street') border-red-300 @enderror"
+                        class="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all @error('shipping_address') border-red-300 @enderror"
                     />
-                    @error('shipping_address.street')
+                    @error('shipping_address')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -94,12 +94,12 @@
                     <label class="text-xs font-bold uppercase text-gray-400">City</label>
                     <input
                         type="text"
-                        name="shipping_address[city]"
-                        value="{{ old('shipping_address.city', $order->shipping_address['city'] ?? '') }}"
+                        name="shipping_city"
+                        value="{{ old('shipping_city', $order->shipping_city) }}"
                         placeholder="Berlin"
-                        class="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all @error('shipping_address.city') border-red-300 @enderror"
+                        class="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all @error('shipping_city') border-red-300 @enderror"
                     />
-                    @error('shipping_address.city')
+                    @error('shipping_city')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -108,12 +108,12 @@
                     <label class="text-xs font-bold uppercase text-gray-400">State/Province</label>
                     <input
                         type="text"
-                        name="shipping_address[state]"
-                        value="{{ old('shipping_address.state', $order->shipping_address['state'] ?? '') }}"
+                        name="shipping_state"
+                        value="{{ old('shipping_state', $order->shipping_state) }}"
                         placeholder="Berlin"
-                        class="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all @error('shipping_address.state') border-red-300 @enderror"
+                        class="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all @error('shipping_state') border-red-300 @enderror"
                     />
-                    @error('shipping_address.state')
+                    @error('shipping_state')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -122,12 +122,12 @@
                     <label class="text-xs font-bold uppercase text-gray-400">Postal Code</label>
                     <input
                         type="text"
-                        name="shipping_address[postal_code]"
-                        value="{{ old('shipping_address.postal_code', $order->shipping_address['postal_code'] ?? '') }}"
+                        name="shipping_postal_code"
+                        value="{{ old('shipping_postal_code', $order->shipping_postal_code) }}"
                         placeholder="10115"
-                        class="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all @error('shipping_address.postal_code') border-red-300 @enderror"
+                        class="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all @error('shipping_postal_code') border-red-300 @enderror"
                     />
-                    @error('shipping_address.postal_code')
+                    @error('shipping_postal_code')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -136,12 +136,12 @@
                     <label class="text-xs font-bold uppercase text-gray-400">Country</label>
                     <input
                         type="text"
-                        name="shipping_address[country]"
-                        value="{{ old('shipping_address.country', $order->shipping_address['country'] ?? '') }}"
+                        name="shipping_country"
+                        value="{{ old('shipping_country', $order->shipping_country) }}"
                         placeholder="Germany"
-                        class="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all @error('shipping_address.country') border-red-300 @enderror"
+                        class="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all @error('shipping_country') border-red-300 @enderror"
                     />
-                    @error('shipping_address.country')
+                    @error('shipping_country')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -186,16 +186,16 @@
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600">Tax</span>
-                        <span class="font-medium">€{{ number_format($order->tax_amount, 2) }}</span>
+                        <span class="font-medium">€{{ number_format($order->tax, 2) }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600">Shipping</span>
-                        <span class="font-medium">€{{ number_format($order->shipping_amount, 2) }}</span>
+                        <span class="font-medium">€{{ number_format($order->shipping, 2) }}</span>
                     </div>
                     <div class="border-t border-gray-300 pt-3">
                         <div class="flex justify-between">
                             <span class="text-lg font-bold text-gray-900">Total</span>
-                            <span class="text-lg font-bold text-gray-900">€{{ number_format($order->total_amount, 2) }}</span>
+                            <span class="text-lg font-bold text-gray-900">€{{ number_format($order->total, 2) }}</span>
                         </div>
                     </div>
                 </div>

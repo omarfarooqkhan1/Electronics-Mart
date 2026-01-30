@@ -41,25 +41,16 @@ class OrderConfirmation extends Mailable
      */
     public function content(): Content
     {
-        // Load order items with their variant and product relationships
-        $orderItems = $this->order->items()->with([
-            'variant.product.images',
-            'variant.main_images'
-        ])->get();
+        // Load order items with their product relationships
+        $orderItems = $this->order->items()->with(['product.images'])->get();
 
         // Add product image to each order item
         $orderItems = $orderItems->map(function ($item) {
             $productImage = null;
             
-            if ($item->variant) {
-                // Try to get variant's main image first
-                if ($item->variant->main_images && $item->variant->main_images->count() > 0) {
-                    $productImage = $item->variant->main_images->first()->url;
-                }
-                // Fallback to product's first image
-                elseif ($item->variant->product && $item->variant->product->images && $item->variant->product->images->count() > 0) {
-                    $productImage = $item->variant->product->images->first()->url;
-                }
+            // Try to get product's first image
+            if ($item->product && $item->product->images && $item->product->images->count() > 0) {
+                $productImage = $item->product->images->first()->url;
             }
             
             $item->product_image = $productImage;

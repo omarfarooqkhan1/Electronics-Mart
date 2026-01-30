@@ -18,7 +18,7 @@ class HandleCors
     {
         // Handle preflight OPTIONS requests
         if ($request->isMethod('OPTIONS')) {
-            return response('', 200)
+            return response()->json(['message' => 'CORS preflight'], 200)
                 ->header('Access-Control-Allow-Origin', '*')
                 ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
                 ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN, X-XSRF-TOKEN')

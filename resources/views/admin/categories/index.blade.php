@@ -61,6 +61,17 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             @foreach($categories as $category)
                 <div class="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden group hover:shadow-2xl transition-all duration-300">
+                    <!-- Category Image -->
+                    @if($category->image_url)
+                        <div class="h-48 bg-gray-100 overflow-hidden">
+                            <img src="{{ $category->image_url }}" alt="{{ $category->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        </div>
+                    @else
+                        <div class="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                            <i data-lucide="image" class="w-12 h-12 text-gray-400"></i>
+                        </div>
+                    @endif
+                    
                     <div class="p-6">
                         <div class="flex items-start justify-between mb-4">
                             <div class="flex-1">

@@ -5,11 +5,19 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
+use App\Services\LocalImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class AdminProductController extends Controller
 {
+    protected $imageService;
+
+    public function __construct(LocalImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     public function index(Request $request)
     {
         $query = Product::with(['category']);
@@ -51,12 +59,16 @@ class AdminProductController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string|min:10',
+            'short_description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
-            'brand' => 'nullable|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'sale_price' => 'nullable|numeric|min:0',
+            'brand' => 'required|string|max:255',
+            'model' => 'nullable|string|max:255',
+            'base_price' => 'required|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
-            'sku' => 'nullable|string|max:255|unique:products,sku',
+            'sku' => 'required|string|max:255|unique:products,sku',
+            'specifications' => 'nullable|json',
+            'warranty_period' => 'nullable|string|max:255',
+            'energy_rating' => 'nullable|string|max:255',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
             'images' => 'nullable|array',
@@ -68,16 +80,35 @@ class AdminProductController extends Controller
             $validated['sku'] = 'PROD-' . strtoupper(Str::random(8));
         }
         
+        // Parse specifications JSON
+        if (!empty($validated['specifications'])) {
+            $validated['specifications'] = json_decode($validated['specifications'], true);
+        }
+        
+        // Remove images from validated data before creating product
+        unset($validated['images']);
+        
         $product = Product::create($validated);
         
-        // Handle image uploads
+        // Handle image uploads using LocalImageService
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $path = $image->store('products', 'public');
-                $product->images()->create([
-                    'url' => '/storage/' . $path,
-                    'alt_text' => $product->name
-                ]);
+            foreach ($request->file('images') as $index => $image) {
+                $uploadResult = $this->imageService->uploadImage(
+                    $image, 
+                    'products', 
+                    null, 
+                    ['max_width' => 1200, 'max_height' => 1200, 'quality' => 85]
+                );
+                
+                if ($uploadResult) {
+                    $product->images()->create([
+                        'url' => $uploadResult['secure_url'],
+                        'alt_text' => $product->name,
+                        'image_type' => $index === 0 ? 'main' : 'gallery',
+                        'sort_order' => $index,
+                        'is_mobile' => false
+                    ]);
+                }
             }
         }
         
@@ -103,28 +134,68 @@ class AdminProductController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string|min:10',
+            'short_description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
-            'brand' => 'nullable|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'sale_price' => 'nullable|numeric|min:0',
+            'brand' => 'required|string|max:255',
+            'model' => 'nullable|string|max:255',
+            'base_price' => 'required|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
-            'sku' => 'nullable|string|max:255|unique:products,sku,' . $product->id,
+            'sku' => 'required|string|max:255|unique:products,sku,' . $product->id,
+            'specifications' => 'nullable|json',
+            'warranty_period' => 'nullable|string|max:255',
+            'energy_rating' => 'nullable|string|max:255',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
             'images' => 'nullable|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'remove_images' => 'nullable|array',
+            'remove_images.*' => 'integer|exists:images,id'
         ]);
+        
+        // Parse specifications JSON
+        if (!empty($validated['specifications'])) {
+            $validated['specifications'] = json_decode($validated['specifications'], true);
+        }
+        
+        // Remove images and remove_images from validated data before updating product
+        unset($validated['images'], $validated['remove_images']);
         
         $product->update($validated);
         
-        // Handle new image uploads
+        // Handle image removal
+        if ($request->has('remove_images') && is_array($request->remove_images)) {
+            foreach ($request->remove_images as $imageId) {
+                $image = $product->images()->find($imageId);
+                if ($image) {
+                    // Delete from storage using LocalImageService
+                    $this->imageService->deleteImage($image->url);
+                    // Delete from database
+                    $image->delete();
+                }
+            }
+        }
+        
+        // Handle new image uploads using LocalImageService
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $path = $image->store('products', 'public');
-                $product->images()->create([
-                    'url' => '/storage/' . $path,
-                    'alt_text' => $product->name
-                ]);
+            $currentMaxOrder = $product->images()->max('sort_order') ?? -1;
+            
+            foreach ($request->file('images') as $index => $image) {
+                $uploadResult = $this->imageService->uploadImage(
+                    $image, 
+                    'products', 
+                    null, 
+                    ['max_width' => 1200, 'max_height' => 1200, 'quality' => 85]
+                );
+                
+                if ($uploadResult) {
+                    $product->images()->create([
+                        'url' => $uploadResult['secure_url'],
+                        'alt_text' => $product->name,
+                        'image_type' => 'gallery',
+                        'sort_order' => $currentMaxOrder + $index + 1,
+                        'is_mobile' => false
+                    ]);
+                }
             }
         }
         
@@ -134,7 +205,10 @@ class AdminProductController extends Controller
     
     public function destroy(Product $product)
     {
-        // Delete associated images
+        // Delete associated images using LocalImageService
+        foreach ($product->images as $image) {
+            $this->imageService->deleteImage($image->url);
+        }
         $product->images()->delete();
         
         $product->delete();

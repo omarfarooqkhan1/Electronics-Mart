@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('url');
             $table->string('alt_text')->nullable();
+            $table->string('image_type')->default('main'); // main, gallery, detailed
+            $table->boolean('is_mobile')->default(false);
             $table->integer('sort_order')->default(0);
             $table->morphs('imageable'); // polymorphic relationship
             $table->timestamps();

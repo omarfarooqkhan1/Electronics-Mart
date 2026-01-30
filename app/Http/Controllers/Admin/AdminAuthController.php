@@ -19,6 +19,11 @@ class AdminAuthController extends Controller
         return view('admin.auth.login');
     }
 
+    public function showForgotPassword()
+    {
+        return view('admin.auth.forgot-password');
+    }
+
     public function login(Request $request)
     {
         $request->validate([

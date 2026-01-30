@@ -362,7 +362,7 @@ class OrderController extends Controller
      */
     public function adminIndex(Request $request)
     {
-        $query = Order::with(['items.variant.images', 'items.variant.product.images']);
+        $query = Order::with(['items.product.images']);
 
         // Filter by status
         if ($request->has('status') && $request->status) {

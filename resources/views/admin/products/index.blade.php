@@ -39,7 +39,8 @@
 
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
             <!-- Search Form -->
-            <form method="GET" action="{{ route('admin.products.index') }}" class="flex gap-4">
+            <!-- Search Form -->
+            <form method="GET" action="{{ route('admin.products.index') }}" class="flex gap-4" id="productFilters">
                 <div class="relative group">
                     <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-orange-500 transition-colors"></i>
                     <input
@@ -48,10 +49,11 @@
                         placeholder="Search products..."
                         value="{{ request('search') }}"
                         class="pl-12 pr-6 py-3.5 bg-gray-100 border-none rounded-2xl w-full sm:w-72 md:w-96 text-sm font-medium focus:ring-2 focus:ring-orange-500 bg-white shadow-sm border border-gray-100 transition-all"
+                        onchange="this.form.submit()"
                     />
                 </div>
 
-                <select name="category" class="px-4 py-3.5 bg-white border border-gray-100 rounded-2xl text-sm font-medium focus:ring-2 focus:ring-orange-500 transition-all min-w-[140px]">
+                <select name="category" class="px-4 py-3.5 bg-white border border-gray-100 rounded-2xl text-sm font-medium focus:ring-2 focus:ring-orange-500 transition-all min-w-[140px]" onchange="this.form.submit()">
                     <option value="">All Categories</option>
                     @foreach($categories as $category)
                         <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
@@ -60,15 +62,11 @@
                     @endforeach
                 </select>
 
-                <select name="status" class="px-4 py-3.5 bg-white border border-gray-100 rounded-2xl text-sm font-medium focus:ring-2 focus:ring-orange-500 transition-all min-w-[120px]">
+                <select name="status" class="px-4 py-3.5 bg-white border border-gray-100 rounded-2xl text-sm font-medium focus:ring-2 focus:ring-orange-500 transition-all min-w-[120px]" onchange="this.form.submit()">
                     <option value="">All Status</option>
                     <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
                     <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
                 </select>
-
-                <button type="submit" class="px-6 py-3.5 bg-gray-100 hover:bg-gray-200 rounded-2xl text-sm font-medium transition-all">
-                    Filter
-                </button>
             </form>
 
             <a href="{{ route('admin.products.create') }}" class="bg-gray-900 border-b-4 border-gray-700 active:border-b-0 active:translate-y-1 hover:bg-black text-white px-8 py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all font-bold shadow-lg">
@@ -142,13 +140,8 @@
                             <td class="px-8 py-6">
                                 <div class="space-y-0.5">
                                     <div class="text-lg font-black text-gray-900">
-                                        €{{ number_format($product->price, 2) }}
+                                        €{{ number_format($product->base_price, 2) }}
                                     </div>
-                                    @if($product->sale_price && $product->sale_price < $product->price)
-                                        <div class="text-xs text-red-500 font-bold bg-red-50 px-2 py-0.5 rounded-md inline-block">
-                                            On Sale: €{{ number_format($product->sale_price, 2) }}
-                                        </div>
-                                    @endif
                                 </div>
                             </td>
                             <td class="px-8 py-6">

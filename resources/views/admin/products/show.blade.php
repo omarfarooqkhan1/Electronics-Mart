@@ -57,10 +57,15 @@
                 @if($product->images->count() > 0)
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
                         @foreach($product->images as $image)
-                            <div class="aspect-square rounded-2xl overflow-hidden border border-gray-200 group hover:shadow-lg transition-all">
+                            <div class="aspect-square rounded-2xl overflow-hidden border border-gray-200 group hover:shadow-lg transition-all relative">
                                 <img src="{{ $image->url }}" 
                                      alt="{{ $image->alt_text }}" 
                                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                @if($image->image_type === 'main')
+                                    <div class="absolute top-2 left-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-bold">
+                                        Main
+                                    </div>
+                                @endif
                             </div>
                         @endforeach
                     </div>
@@ -89,8 +94,33 @@
                 
                 <div class="prose prose-gray max-w-none">
                     <p class="text-gray-700 leading-relaxed">{{ $product->description }}</p>
+                    @if($product->short_description)
+                        <div class="mt-4 p-4 bg-gray-50 rounded-xl">
+                            <h4 class="font-semibold text-gray-900 mb-2">Summary</h4>
+                            <p class="text-gray-600">{{ $product->short_description }}</p>
+                        </div>
+                    @endif
                 </div>
             </div>
+
+            @if($product->specifications)
+                <!-- Product Specifications -->
+                <div class="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 p-6 mt-6">
+                    <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                        <i data-lucide="settings" class="w-5 h-5 text-purple-600"></i>
+                        Specifications
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        @foreach($product->specifications as $key => $value)
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                                <span class="text-gray-600 font-medium">{{ ucfirst(str_replace('_', ' ', $key)) }}</span>
+                                <span class="font-semibold text-gray-900">{{ $value }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
         </div>
 
         <!-- Product Details -->
@@ -104,28 +134,9 @@
                 
                 <div class="space-y-4">
                     <div class="flex justify-between items-center">
-                        <span class="text-gray-600">Regular Price</span>
-                        <span class="text-2xl font-bold text-gray-900">€{{ number_format($product->price, 2) }}</span>
+                        <span class="text-gray-600">Base Price</span>
+                        <span class="text-2xl font-bold text-gray-900">€{{ number_format($product->base_price, 2) }}</span>
                     </div>
-                    
-                    @if($product->sale_price)
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-600">Sale Price</span>
-                            <span class="text-2xl font-bold text-green-600">€{{ number_format($product->sale_price, 2) }}</span>
-                        </div>
-                        
-                        <div class="bg-green-50 border border-green-200 rounded-xl p-4">
-                            <div class="flex items-center gap-2 text-green-800">
-                                <i data-lucide="tag" class="w-4 h-4"></i>
-                                <span class="font-bold text-sm">
-                                    {{ round((($product->price - $product->sale_price) / $product->price) * 100) }}% OFF
-                                </span>
-                            </div>
-                            <p class="text-green-700 text-sm mt-1">
-                                Save €{{ number_format($product->price - $product->sale_price, 2) }}
-                            </p>
-                        </div>
-                    @endif
                 </div>
             </div>
 
@@ -182,6 +193,27 @@
                         <div class="flex justify-between items-center">
                             <span class="text-gray-600">Brand</span>
                             <span class="font-medium">{{ $product->brand }}</span>
+                        </div>
+                    @endif
+                    
+                    @if($product->model)
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Model</span>
+                            <span class="font-medium">{{ $product->model }}</span>
+                        </div>
+                    @endif
+                    
+                    @if($product->warranty_period)
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Warranty</span>
+                            <span class="font-medium">{{ $product->warranty_period }}</span>
+                        </div>
+                    @endif
+                    
+                    @if($product->energy_rating)
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Energy Rating</span>
+                            <span class="font-medium">{{ $product->energy_rating }}</span>
                         </div>
                     @endif
                     
