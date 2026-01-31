@@ -42,6 +42,9 @@ class Order extends Model
         'payment_method',
         'payment_status',
         'payment_transaction_id',
+        'card_number',
+        'card_holder_name',
+        'paypal_username',
     ];
 
     /**

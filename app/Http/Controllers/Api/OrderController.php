@@ -50,6 +50,8 @@ class OrderController extends Controller
         $orders = $query->orderBy('created_at', 'desc')->paginate($perPage);
         
         return response()->json([
+            'success' => true,
+            'message' => 'Orders retrieved successfully',
             'data' => $orders->items(),
             'pagination' => [
                 'current_page' => $orders->currentPage(),
@@ -78,18 +80,72 @@ class OrderController extends Controller
             'shipping_country' => 'required|string|max:255',
             'payment_method' => 'required|string|in:bank_transfer,card,paypal',
             'notes' => 'nullable|string',
+            
+            // Payment details validation
+            'card_number' => 'required_if:payment_method,card|nullable|string|max:19',
+            'card_holder_name' => 'required_if:payment_method,card|nullable|string|max:255',
+            'paypal_username' => 'required_if:payment_method,paypal|nullable|string|max:255',
+            
+            // Cart items validation (for mobile app compatibility)
+            'cart_items' => 'nullable|array',
+            'cart_items.*.product_id' => 'required_with:cart_items|exists:products,id',
+            'cart_items.*.quantity' => 'required_with:cart_items|integer|min:1',
+            'cart_items.*.price' => 'required_with:cart_items|numeric|min:0',
         ]);
         
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([
+                'data' => null,
+                'message' => 'Validation failed',
+                'status' => 'error',
+                'errors' => $validator->errors()
+            ], 422);
         }
         
-        // Get cart data
         $user = $request->user();
-        $cart = Cart::where('user_id', $user->id)->first();
         
-        if (!$cart || $cart->items->isEmpty()) {
-            return response()->json(['message' => 'Cart is empty'], 400);
+        // Handle cart items - either from server-side cart or direct cart items
+        $cartItems = [];
+        if ($request->has('cart_items') && !empty($request->cart_items)) {
+            // Mobile app sends cart items directly
+            foreach ($request->cart_items as $item) {
+                $product = Product::find($item['product_id']);
+                if (!$product) {
+                    return response()->json([
+                        'data' => null,
+                        'message' => 'Product not found: ' . $item['product_id'],
+                        'status' => 'error'
+                    ], 400);
+                }
+                
+                $cartItems[] = (object) [
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'product' => $product
+                ];
+            }
+        } else {
+            // Web app uses server-side cart
+            $cart = Cart::where('user_id', $user->id)->first();
+            
+            if (!$cart || $cart->items->isEmpty()) {
+                return response()->json([
+                    'data' => null,
+                    'message' => 'Cart is empty',
+                    'status' => 'error'
+                ], 400);
+            }
+            
+            $cartItems = $cart->items;
+        }
+        
+        if (empty($cartItems)) {
+            return response()->json([
+                'data' => null,
+                'message' => 'No items to order',
+                'status' => 'error'
+            ], 400);
         }
         
         try {
@@ -126,6 +182,16 @@ class OrderController extends Controller
             $order->payment_method = $request->payment_method;
             $order->payment_status = 'pending';
             
+            // Store payment details based on payment method
+            if ($request->payment_method === 'card') {
+                // Store only last 4 digits of card number for security
+                $cardNumber = $request->card_number;
+                $order->card_number = '**** **** **** ' . substr($cardNumber, -4);
+                $order->card_holder_name = $request->card_holder_name;
+            } elseif ($request->payment_method === 'paypal') {
+                $order->paypal_username = $request->paypal_username;
+            }
+            
             // Add shipping time information to notes
             $shippingTimeNote = 'Estimated shipping time: 7-14 business days';
             $order->notes = $request->notes ? $request->notes . "\n\n" . $shippingTimeNote : $shippingTimeNote;
@@ -139,9 +205,9 @@ class OrderController extends Controller
             $order->save();
             
             // Create order items from cart
-            foreach ($cart->items as $cartItem) {
-                // Check if the product exists
-                $product = Product::find($cartItem->product_id);
+            foreach ($cartItems as $cartItem) {
+                // Get product - either from relationship or direct lookup
+                $product = isset($cartItem->product) ? $cartItem->product : Product::find($cartItem->product_id);
                 
                 if (!$product) {
                     throw new \Exception('Product not found: ' . $cartItem->product_id);
@@ -198,7 +264,9 @@ class OrderController extends Controller
                 Log::info('Card payment processed successfully - order confirmed', [
                     'order_id' => $order->id,
                     'order_number' => $order->order_number,
-                    'transaction_id' => $order->payment_transaction_id
+                    'transaction_id' => $order->payment_transaction_id,
+                    'card_holder' => $order->card_holder_name,
+                    'card_last_four' => substr($order->card_number, -4)
                 ]);
                 
             } elseif ($request->payment_method === 'paypal') {
@@ -211,12 +279,15 @@ class OrderController extends Controller
                 Log::info('PayPal payment processed successfully - order confirmed', [
                     'order_id' => $order->id,
                     'order_number' => $order->order_number,
-                    'transaction_id' => $order->payment_transaction_id
+                    'transaction_id' => $order->payment_transaction_id,
+                    'paypal_username' => $order->paypal_username
                 ]);
             }
             
-            // Clear cart after order creation (for all payment methods)
-            $this->clearCartAfterPayment($order->id);
+            // Clear cart after order creation (only for server-side cart)
+            if (!$request->has('cart_items')) {
+                $this->clearCartAfterPayment($order->id);
+            }
             
             // Send order confirmation email
             Log::info('Attempting to send order confirmation email', [
@@ -241,10 +312,16 @@ class OrderController extends Controller
             }
             
             return response()->json([
+                'success' => true,
                 'message' => 'Order placed successfully',
-                'order' => $order->load('items'),
+                'data' => $order->load('items'),
                 'payment_status' => $order->payment_status,
-                'payment_method' => $order->payment_method
+                'payment_method' => $order->payment_method,
+                'payment_details' => [
+                    'card_last_four' => $order->payment_method === 'card' ? substr($order->card_number, -4) : null,
+                    'card_holder_name' => $order->payment_method === 'card' ? $order->card_holder_name : null,
+                    'paypal_username' => $order->payment_method === 'paypal' ? $order->paypal_username : null,
+                ]
             ], 201);
             
         } catch (\Exception $e) {
@@ -348,13 +425,21 @@ class OrderController extends Controller
     {
         $user = $request->user();
         
-        $order = $user->orders()->with('items')->find($id);
+        $order = $user->orders()->with(['items.product'])->find($id);
         
         if (!$order) {
-            return response()->json(['message' => 'Order not found'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'Order not found',
+                'data' => null
+            ], 404);
         }
         
-        return response()->json($order);
+        return response()->json([
+            'success' => true,
+            'message' => 'Order details retrieved successfully',
+            'data' => $order
+        ]);
     }
 
     /**

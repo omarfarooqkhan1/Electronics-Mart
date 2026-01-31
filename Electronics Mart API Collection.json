@@ -2,11 +2,34 @@
   "info": {
     "_postman_id": "electronics-mart-api-2026",
     "name": "Electronics Mart API Collection",
-    "description": "Complete API collection for Electronics Mart e-commerce platform with authentication-only access",
+    "description": "Complete API collection for Electronics Mart e-commerce platform with comprehensive payment processing.\n\n## 🚀 Features\n- **Authentication System**: Customer registration, login, email verification\n- **Product Management**: Browse products and categories\n- **Shopping Cart**: Add, update, remove items\n- **Order Processing**: Complete checkout with multiple payment methods\n- **Payment Methods**: Card payments, PayPal, and Bank transfers\n\n## 💳 Payment Processing\n\n### Card Payments\n- Requires `card_number` and `card_holder_name`\n- Card numbers are masked in responses (last 4 digits only)\n- Automatic payment processing and order confirmation\n\n### PayPal Payments\n- Requires `paypal_username` (email or username)\n- Automatic payment processing and order confirmation\n\n### Bank Transfers\n- No additional fields required\n- Orders remain in 'processing' status until manual confirmation\n\n## 🔒 Security\n- All API endpoints require authentication (except public browsing)\n- Card numbers are never stored in full (masked after processing)\n- Secure token-based authentication\n- Input validation and error handling\n\n## 📋 Usage\n1. **Setup**: Set `base_url` variable to your API endpoint\n2. **Authenticate**: Register/login to get auth token\n3. **Browse**: View products and categories\n4. **Shop**: Add items to cart\n5. **Checkout**: Create order with payment details\n\n## 🛠️ Environment Variables\n- `base_url`: Your API base URL (e.g., http://localhost:8000/api)\n- `auth_token`: Authentication token (auto-set after login)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "electronics-mart"
   },
   "item": [
+    {
+      "name": "📖 Payment Documentation",
+      "item": [
+        {
+          "name": "Payment Methods Overview",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/test",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "test"
+              ]
+            },
+            "description": "# Payment Methods Overview\n\nThe Electronics Mart API supports three payment methods for order processing:\n\n## 💳 Card Payments\n\n**Required Fields:**\n- `payment_method`: \"card\"\n- `card_number`: Full card number (16-19 digits)\n- `card_holder_name`: Name on the card\n\n**Security:**\n- Card numbers are immediately masked after processing\n- Only last 4 digits stored and returned in responses\n- Format: \"**** **** **** 1234\"\n\n**Processing:**\n- Automatic payment processing\n- Order status set to \"confirmed\"\n- Payment status set to \"completed\"\n\n## 💰 PayPal Payments\n\n**Required Fields:**\n- `payment_method`: \"paypal\"\n- `paypal_username`: PayPal email or username\n\n**Processing:**\n- Automatic payment processing\n- Order status set to \"confirmed\"\n- Payment status set to \"completed\"\n\n## 🏦 Bank Transfer\n\n**Required Fields:**\n- `payment_method`: \"bank_transfer\"\n\n**Processing:**\n- Manual payment confirmation required\n- Order status remains \"processing\"\n- Payment status remains \"pending\"\n\n## 📋 Common Order Fields\n\nAll payment methods require these shipping fields:\n- `shipping_name`: Recipient name\n- `shipping_email`: Recipient email\n- `shipping_phone`: Phone number (optional)\n- `shipping_address`: Street address\n- `shipping_city`: City\n- `shipping_state`: State/Province\n- `shipping_postal_code`: ZIP/Postal code\n- `shipping_country`: Country\n- `notes`: Order notes (optional)\n\n## ✅ Validation Rules\n\n- Card payments: `card_number` and `card_holder_name` are required\n- PayPal payments: `paypal_username` is required\n- Bank transfers: No additional fields required\n- Missing required fields return 422 validation errors\n\n## 📤 Response Format\n\nSuccessful orders return:\n```json\n{\n  \"message\": \"Order placed successfully\",\n  \"order\": { /* order details */ },\n  \"payment_status\": \"completed|pending\",\n  \"payment_method\": \"card|paypal|bank_transfer\",\n  \"payment_details\": {\n    \"card_last_four\": \"1234\", // for card payments\n    \"card_holder_name\": \"John Doe\", // for card payments\n    \"paypal_username\": \"user@paypal.com\" // for PayPal payments\n  }\n}\n```"
+          },
+          "response": []
+        }
+      ]
+    },
     {
       "name": "🔐 Authentication",
       "item": [
@@ -1064,7 +1087,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"shipping_name\": \"Jane Smith\",\n  \"shipping_email\": \"jane@example.com\",\n  \"shipping_phone\": \"+49-30-87654321\",\n  \"shipping_address\": \"456 Oak Avenue\",\n  \"shipping_city\": \"Munich\",\n  \"shipping_state\": \"Bavaria\",\n  \"shipping_postal_code\": \"80331\",\n  \"shipping_country\": \"Germany\",\n  \"payment_method\": \"card\",\n  \"notes\": \"Free shipping - Urgent delivery required\"\n}"
+              "raw": "{\n  \"shipping_name\": \"Jane Smith\",\n  \"shipping_email\": \"jane@example.com\",\n  \"shipping_phone\": \"+49-30-87654321\",\n  \"shipping_address\": \"456 Oak Avenue\",\n  \"shipping_city\": \"Munich\",\n  \"shipping_state\": \"Bavaria\",\n  \"shipping_postal_code\": \"80331\",\n  \"shipping_country\": \"Germany\",\n  \"payment_method\": \"card\",\n  \"card_number\": \"4532123456789012\",\n  \"card_holder_name\": \"Jane Smith\",\n  \"notes\": \"Free shipping - Urgent delivery required\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/orders",
@@ -1076,7 +1099,50 @@
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Successful Card Order",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"shipping_name\": \"Jane Smith\",\n  \"shipping_email\": \"jane@example.com\",\n  \"shipping_phone\": \"+49-30-87654321\",\n  \"shipping_address\": \"456 Oak Avenue\",\n  \"shipping_city\": \"Munich\",\n  \"shipping_state\": \"Bavaria\",\n  \"shipping_postal_code\": \"80331\",\n  \"shipping_country\": \"Germany\",\n  \"payment_method\": \"card\",\n  \"card_number\": \"4532123456789012\",\n  \"card_holder_name\": \"Jane Smith\",\n  \"notes\": \"Free shipping - Urgent delivery required\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/orders",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "orders"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Order placed successfully\",\n  \"order\": {\n    \"id\": 2,\n    \"user_id\": 2,\n    \"order_number\": \"ORD20260131101945XYZ2\",\n    \"status\": \"confirmed\",\n    \"payment_method\": \"card\",\n    \"payment_status\": \"completed\",\n    \"payment_transaction_id\": \"CARD_697dd74155dff\",\n    \"card_number\": \"**** **** **** 9012\",\n    \"card_holder_name\": \"Jane Smith\",\n    \"shipping_name\": \"Jane Smith\",\n    \"shipping_email\": \"jane@example.com\",\n    \"shipping_phone\": \"+49-30-87654321\",\n    \"shipping_address\": \"456 Oak Avenue\",\n    \"shipping_city\": \"Munich\",\n    \"shipping_state\": \"Bavaria\",\n    \"shipping_postal_code\": \"80331\",\n    \"shipping_country\": \"Germany\",\n    \"subtotal\": 25999,\n    \"tax\": 3977.85,\n    \"shipping\": 0,\n    \"total\": 25999,\n    \"notes\": \"Free shipping - Urgent delivery required\\n\\nEstimated shipping time: 7-14 business days\",\n    \"created_at\": \"2026-01-31T10:19:45.000000Z\",\n    \"updated_at\": \"2026-01-31T10:19:45.000000Z\",\n    \"items\": [\n      {\n        \"id\": 2,\n        \"order_id\": 2,\n        \"product_id\": 1,\n        \"product_name\": \"Samsung 253L Double Door Refrigerator\",\n        \"price\": \"25999.00\",\n        \"quantity\": 1,\n        \"subtotal\": \"25999.00\"\n      }\n    ]\n  },\n  \"payment_status\": \"completed\",\n  \"payment_method\": \"card\",\n  \"payment_details\": {\n    \"card_last_four\": \"9012\",\n    \"card_holder_name\": \"Jane Smith\",\n    \"paypal_username\": null\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Create Order - PayPal",
@@ -1098,7 +1164,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"shipping_name\": \"Mike Johnson\",\n  \"shipping_email\": \"mike@example.com\",\n  \"shipping_phone\": \"+49-30-11223344\",\n  \"shipping_address\": \"789 Pine Street\",\n  \"shipping_city\": \"Hamburg\",\n  \"shipping_state\": \"Hamburg\",\n  \"shipping_postal_code\": \"20095\",\n  \"shipping_country\": \"Germany\",\n  \"payment_method\": \"paypal\"\n}"
+              "raw": "{\n  \"shipping_name\": \"Mike Johnson\",\n  \"shipping_email\": \"mike@example.com\",\n  \"shipping_phone\": \"+49-30-11223344\",\n  \"shipping_address\": \"789 Pine Street\",\n  \"shipping_city\": \"Hamburg\",\n  \"shipping_state\": \"Hamburg\",\n  \"shipping_postal_code\": \"20095\",\n  \"shipping_country\": \"Germany\",\n  \"payment_method\": \"paypal\",\n  \"paypal_username\": \"mike.johnson@paypal.com\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/orders",
@@ -1110,7 +1176,204 @@
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "Successful PayPal Order",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"shipping_name\": \"Mike Johnson\",\n  \"shipping_email\": \"mike@example.com\",\n  \"shipping_phone\": \"+49-30-11223344\",\n  \"shipping_address\": \"789 Pine Street\",\n  \"shipping_city\": \"Hamburg\",\n  \"shipping_state\": \"Hamburg\",\n  \"shipping_postal_code\": \"20095\",\n  \"shipping_country\": \"Germany\",\n  \"payment_method\": \"paypal\",\n  \"paypal_username\": \"mike.johnson@paypal.com\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/orders",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "orders"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Order placed successfully\",\n  \"order\": {\n    \"id\": 1,\n    \"user_id\": 2,\n    \"order_number\": \"ORD20260131101945ABC1\",\n    \"status\": \"confirmed\",\n    \"payment_method\": \"paypal\",\n    \"payment_status\": \"completed\",\n    \"payment_transaction_id\": \"PAYPAL_697dd74155dff\",\n    \"paypal_username\": \"mike.johnson@paypal.com\",\n    \"shipping_name\": \"Mike Johnson\",\n    \"shipping_email\": \"mike@example.com\",\n    \"shipping_phone\": \"+49-30-11223344\",\n    \"shipping_address\": \"789 Pine Street\",\n    \"shipping_city\": \"Hamburg\",\n    \"shipping_state\": \"Hamburg\",\n    \"shipping_postal_code\": \"20095\",\n    \"shipping_country\": \"Germany\",\n    \"subtotal\": 25999,\n    \"tax\": 3977.85,\n    \"shipping\": 0,\n    \"total\": 25999,\n    \"created_at\": \"2026-01-31T10:19:45.000000Z\",\n    \"updated_at\": \"2026-01-31T10:19:45.000000Z\",\n    \"items\": [\n      {\n        \"id\": 1,\n        \"order_id\": 1,\n        \"product_id\": 1,\n        \"product_name\": \"Samsung 253L Double Door Refrigerator\",\n        \"price\": \"25999.00\",\n        \"quantity\": 1,\n        \"subtotal\": \"25999.00\"\n      }\n    ]\n  },\n  \"payment_status\": \"completed\",\n  \"payment_method\": \"paypal\",\n  \"payment_details\": {\n    \"card_last_four\": null,\n    \"card_holder_name\": null,\n    \"paypal_username\": \"mike.johnson@paypal.com\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Order - Card Payment (Validation Error)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shipping_name\": \"Test User\",\n  \"shipping_email\": \"test@example.com\",\n  \"shipping_phone\": \"+1-555-0123\",\n  \"shipping_address\": \"123 Test Street\",\n  \"shipping_city\": \"Test City\",\n  \"shipping_state\": \"Test State\",\n  \"shipping_postal_code\": \"12345\",\n  \"shipping_country\": \"USA\",\n  \"payment_method\": \"card\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Validation Error - Missing Card Details",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"shipping_name\": \"Test User\",\n  \"shipping_email\": \"test@example.com\",\n  \"shipping_address\": \"123 Test Street\",\n  \"shipping_city\": \"Test City\",\n  \"shipping_state\": \"Test State\",\n  \"shipping_postal_code\": \"12345\",\n  \"shipping_country\": \"USA\",\n  \"payment_method\": \"card\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/orders",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "orders"
+                  ]
+                }
+              },
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": {\n    \"card_number\": [\n      \"The card number field is required when payment method is card.\"\n    ],\n    \"card_holder_name\": [\n      \"The card holder name field is required when payment method is card.\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Order - PayPal Payment (Validation Error)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shipping_name\": \"Test User\",\n  \"shipping_email\": \"test@example.com\",\n  \"shipping_phone\": \"+1-555-0123\",\n  \"shipping_address\": \"123 Test Street\",\n  \"shipping_city\": \"Test City\",\n  \"shipping_state\": \"Test State\",\n  \"shipping_postal_code\": \"12345\",\n  \"shipping_country\": \"USA\",\n  \"payment_method\": \"paypal\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Validation Error - Missing PayPal Username",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"shipping_name\": \"Test User\",\n  \"shipping_email\": \"test@example.com\",\n  \"shipping_address\": \"123 Test Street\",\n  \"shipping_city\": \"Test City\",\n  \"shipping_state\": \"Test State\",\n  \"shipping_postal_code\": \"12345\",\n  \"shipping_country\": \"USA\",\n  \"payment_method\": \"paypal\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/orders",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "orders"
+                  ]
+                }
+              },
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": {\n    \"paypal_username\": [\n      \"The paypal username field is required when payment method is paypal.\"\n    ]\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Get Order by ID",

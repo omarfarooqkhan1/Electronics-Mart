@@ -68,10 +68,75 @@
             </div>
         </section>
 
+        <!-- Payment Details (Read-only) -->
+        <section class="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 p-6">
+            <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2 mb-6">
+                <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm">02</span>
+                Payment Details
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-3">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Payment Method</span>
+                        <span class="font-medium">{{ ucfirst(str_replace('_', ' ', $order->payment_method)) }}</span>
+                    </div>
+                    
+                    @if($order->payment_method === 'card')
+                        @if($order->card_number)
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Card Number</span>
+                                <span class="font-medium font-mono">{{ $order->card_number }}</span>
+                            </div>
+                        @endif
+                        @if($order->card_holder_name)
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Card Holder</span>
+                                <span class="font-medium">{{ $order->card_holder_name }}</span>
+                            </div>
+                        @endif
+                    @endif
+                    
+                    @if($order->payment_method === 'paypal' && $order->paypal_username)
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">PayPal Username</span>
+                            <span class="font-medium">{{ $order->paypal_username }}</span>
+                        </div>
+                    @endif
+                </div>
+                
+                <div class="space-y-3">
+                    @if($order->payment_transaction_id)
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Transaction ID</span>
+                            <span class="font-medium font-mono text-xs">{{ $order->payment_transaction_id }}</span>
+                        </div>
+                    @endif
+                    
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Payment Status</span>
+                        <span class="font-medium {{ $order->payment_status === 'completed' ? 'text-green-600' : ($order->payment_status === 'failed' ? 'text-red-600' : 'text-yellow-600') }}">
+                            {{ ucfirst($order->payment_status) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            @if($order->payment_method === 'bank_transfer' && $order->payment_status === 'pending')
+                <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="alert-triangle" class="w-4 h-4 text-yellow-600"></i>
+                        <span class="text-sm font-medium text-yellow-800">Bank Transfer Pending</span>
+                    </div>
+                    <p class="text-sm text-yellow-700 mt-1">This order is awaiting bank transfer confirmation. Update payment status to "Completed" once payment is received.</p>
+                </div>
+            @endif
+        </section>
+
         <!-- Shipping Address -->
         <section class="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 p-6">
             <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2 mb-6">
-                <span class="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center text-sm">02</span>
+                <span class="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center text-sm">03</span>
                 Shipping Address
             </h3>
             
@@ -151,7 +216,7 @@
         <!-- Notes -->
         <section class="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 p-6">
             <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2 mb-6">
-                <span class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-sm">03</span>
+                <span class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-sm">04</span>
                 Order Notes
             </h3>
             

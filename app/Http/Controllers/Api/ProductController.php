@@ -40,6 +40,13 @@ class ProductController extends Controller
             });
         }
 
+        // Filter by category name (for mobile app compatibility)
+        if ($request->has('category_name') && $request->category_name) {
+            $query->whereHas('category', function ($q) use ($request) {
+                $q->where('name', $request->category_name);
+            });
+        }
+
         // Filter by price range
         if ($request->has('min_price') && $request->min_price) {
             $query->where('base_price', '>=', $request->min_price);

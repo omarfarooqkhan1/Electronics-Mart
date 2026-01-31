@@ -103,6 +103,9 @@
                                 Date
                             </th>
                             <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                Payment
+                            </th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                                 Amount
                             </th>
                             <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
@@ -134,6 +137,39 @@
                                     </div>
                                     <div class="text-xs text-gray-500">
                                         {{ $order->created_at->format('h:i A') }}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center gap-2">
+                                        @if($order->payment_method === 'card')
+                                            <div class="w-6 h-6 bg-blue-100 rounded flex items-center justify-center">
+                                                <i data-lucide="credit-card" class="w-3 h-3 text-blue-600"></i>
+                                            </div>
+                                            <div>
+                                                <div class="text-sm font-medium text-gray-900">Card</div>
+                                                @if($order->card_number)
+                                                    <div class="text-xs text-gray-500 font-mono">{{ $order->card_number }}</div>
+                                                @endif
+                                            </div>
+                                        @elseif($order->payment_method === 'paypal')
+                                            <div class="w-6 h-6 bg-yellow-100 rounded flex items-center justify-center">
+                                                <i data-lucide="wallet" class="w-3 h-3 text-yellow-600"></i>
+                                            </div>
+                                            <div>
+                                                <div class="text-sm font-medium text-gray-900">PayPal</div>
+                                                @if($order->paypal_username)
+                                                    <div class="text-xs text-gray-500">{{ Str::limit($order->paypal_username, 20) }}</div>
+                                                @endif
+                                            </div>
+                                        @else
+                                            <div class="w-6 h-6 bg-gray-100 rounded flex items-center justify-center">
+                                                <i data-lucide="building-2" class="w-3 h-3 text-gray-600"></i>
+                                            </div>
+                                            <div>
+                                                <div class="text-sm font-medium text-gray-900">Bank Transfer</div>
+                                                <div class="text-xs text-gray-500">{{ ucfirst($order->payment_status) }}</div>
+                                            </div>
+                                        @endif
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">

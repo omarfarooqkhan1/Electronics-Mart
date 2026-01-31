@@ -37,6 +37,17 @@ Route::get('test', function () {
 
 /*
 |--------------------------------------------------------------------------
+| Public Routes (No Authentication Required)
+|--------------------------------------------------------------------------
+*/
+// Products and Categories (Public for browsing)
+Route::apiResource('products', ProductController::class)->only(['index', 'show']);
+Route::get('products/brands', [ProductController::class, 'getBrands']);
+Route::get('products/energy-ratings', [ProductController::class, 'getEnergyRatings']);
+Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
+
+/*
+|--------------------------------------------------------------------------
 | Authentication Routes (Public)
 |--------------------------------------------------------------------------
 */
@@ -67,12 +78,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::apiResource('addresses', AddressController::class);
         Route::patch('addresses/{address}/default', [AddressController::class, 'setDefault']);
     });
-    
-    // Products and Categories (Authenticated Only)
-    Route::apiResource('products', ProductController::class)->only(['index', 'show']);
-    Route::get('products/brands', [ProductController::class, 'getBrands']);
-    Route::get('products/energy-ratings', [ProductController::class, 'getEnergyRatings']);
-    Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
     
     // Cart Routes (Authenticated Only)
     Route::prefix('cart')->group(function () {

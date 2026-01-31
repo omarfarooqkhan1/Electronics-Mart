@@ -42,6 +42,19 @@ class AdminDashboardController extends Controller
         
         $stats['total_revenue'] = Order::whereIn('status', ['delivered', 'confirmed'])->sum('total');
 
+        // Payment method statistics
+        $stats['card_payments'] = Order::where('payment_method', 'card')
+            ->where('created_at', '>=', $startDate)
+            ->count();
+        
+        $stats['paypal_payments'] = Order::where('payment_method', 'paypal')
+            ->where('created_at', '>=', $startDate)
+            ->count();
+            
+        $stats['bank_transfer_payments'] = Order::where('payment_method', 'bank_transfer')
+            ->where('created_at', '>=', $startDate)
+            ->count();
+
         // Low stock products (simplified - no variants)
         $lowStockProducts = Product::where('is_active', true)
             ->where('stock_quantity', '<=', 10) // Consider products with 10 or less as low stock

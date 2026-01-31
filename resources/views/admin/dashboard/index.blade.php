@@ -154,6 +154,57 @@
         </div>
     </div>
 
+    <!-- Payment Methods Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Card Payments -->
+        <div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-2xl p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="flex items-center space-x-2 mb-2">
+                        <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                            <i data-lucide="credit-card" class="w-4 h-4 text-white"></i>
+                        </div>
+                        <h3 class="text-sm font-semibold text-blue-800">Card Payments</h3>
+                    </div>
+                    <p class="text-2xl font-bold text-blue-900">{{ number_format($stats['card_payments']) }}</p>
+                    <p class="text-xs text-blue-700">Last {{ $dateFilter }} days</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PayPal Payments -->
+        <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 border border-yellow-200 rounded-2xl p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="flex items-center space-x-2 mb-2">
+                        <div class="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
+                            <i data-lucide="wallet" class="w-4 h-4 text-white"></i>
+                        </div>
+                        <h3 class="text-sm font-semibold text-yellow-800">PayPal Payments</h3>
+                    </div>
+                    <p class="text-2xl font-bold text-yellow-900">{{ number_format($stats['paypal_payments']) }}</p>
+                    <p class="text-xs text-yellow-700">Last {{ $dateFilter }} days</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bank Transfer Payments -->
+        <div class="bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-2xl p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="flex items-center space-x-2 mb-2">
+                        <div class="w-8 h-8 bg-gray-500 rounded-lg flex items-center justify-center">
+                            <i data-lucide="building-2" class="w-4 h-4 text-white"></i>
+                        </div>
+                        <h3 class="text-sm font-semibold text-gray-800">Bank Transfers</h3>
+                    </div>
+                    <p class="text-2xl font-bold text-gray-900">{{ number_format($stats['bank_transfer_payments']) }}</p>
+                    <p class="text-xs text-gray-700">Last {{ $dateFilter }} days</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Recent Orders -->

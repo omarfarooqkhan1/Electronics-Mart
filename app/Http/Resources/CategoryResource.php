@@ -15,8 +15,12 @@ class CategoryResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            // Mobile app compatibility fields (CategoryModel)
+            'imageUrl' => $this->image_url,
             'name' => $this->name,
+            
+            // Original API fields for backward compatibility
+            'id' => $this->id,
             'slug' => $this->slug,
             'description' => $this->description,
             'image_url' => $this->image_url,

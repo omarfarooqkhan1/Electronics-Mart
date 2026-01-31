@@ -146,6 +146,33 @@
                                 {{ ucfirst($order->payment_status) }}
                             </span>
                         </div>
+                        
+                        @if($order->payment_method === 'card' && $order->card_number)
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Card Number</span>
+                                <span class="font-medium font-mono">{{ $order->card_number }}</span>
+                            </div>
+                            @if($order->card_holder_name)
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600">Card Holder</span>
+                                    <span class="font-medium">{{ $order->card_holder_name }}</span>
+                                </div>
+                            @endif
+                        @endif
+                        
+                        @if($order->payment_method === 'paypal' && $order->paypal_username)
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">PayPal Username</span>
+                                <span class="font-medium">{{ $order->paypal_username }}</span>
+                            </div>
+                        @endif
+                        
+                        @if($order->payment_transaction_id)
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Transaction ID</span>
+                                <span class="font-medium font-mono text-xs">{{ $order->payment_transaction_id }}</span>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

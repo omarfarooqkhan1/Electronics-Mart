@@ -43,8 +43,12 @@ class AuthController extends Controller
         }
 
         return response()->json([
+            'data' => [
+                'user_id' => $user->id,
+                'requires_verification' => true
+            ],
             'message' => 'Registration successful. Verification code sent to email.',
-            'user_id' => $user->id,
+            'status' => 'success'
         ], 201);
     }
 
@@ -65,7 +69,9 @@ class AuthController extends Controller
             !$user->email_verification_code_created_at ||
             $user->email_verification_code_created_at->addMinutes(10)->isPast()) {
             return response()->json([
-                'message' => 'Invalid or expired verification code'
+                'data' => null,
+                'message' => 'Invalid or expired verification code',
+                'status' => 'error'
             ], 422);
         }
 
@@ -78,14 +84,17 @@ class AuthController extends Controller
         $token = $user->createToken('user-session')->plainTextToken;
 
         return response()->json([
-            'message' => 'Email verified successfully',
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role,
+            'data' => [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                ],
+                'token' => $token
             ],
-            'token' => $token
+            'message' => 'Email verified successfully',
+            'status' => 'success'
         ]);
     }
 
@@ -102,7 +111,9 @@ class AuthController extends Controller
 
         if ($user->email_verified_at) {
             return response()->json([
-                'message' => 'Email is already verified'
+                'data' => null,
+                'message' => 'Email is already verified',
+                'status' => 'error'
             ], 422);
         }
 
@@ -122,7 +133,11 @@ class AuthController extends Controller
         }
 
         return response()->json([
-            'message' => 'Verification code sent to email'
+            'data' => [
+                'message' => 'Verification code sent to email'
+            ],
+            'message' => 'Verification code sent to email',
+            'status' => 'success'
         ]);
     }
 
@@ -140,7 +155,9 @@ class AuthController extends Controller
 
         if (!$user || !Hash::check($validated['password'], $user->password)) {
             return response()->json([
-                'message' => 'Invalid credentials'
+                'data' => null,
+                'message' => 'Invalid credentials',
+                'status' => 'error'
             ], 401);
         }
 
@@ -160,23 +177,29 @@ class AuthController extends Controller
             }
 
             return response()->json([
+                'data' => [
+                    'user_id' => $user->id,
+                    'requires_verification' => true
+                ],
                 'message' => 'Email not verified. Verification code sent to email.',
-                'user_id' => $user->id,
-                'requires_verification' => true
+                'status' => 'error'
             ], 422);
         }
 
         $token = $user->createToken('user-session')->plainTextToken;
 
         return response()->json([
-            'message' => 'Login successful',
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role,
+            'data' => [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                ],
+                'token' => $token
             ],
-            'token' => $token
+            'message' => 'Login successful',
+            'status' => 'success'
         ]);
     }
 
@@ -254,6 +277,86 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Logged out successfully'
         ]);
+    }
+
+    /**
+     * Mobile app login (simplified response)
+     */
+    public function mobileLogin(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        $user = User::where('email', $validated['email'])->first();
+
+        if (!$user || !Hash::check($validated['password'], $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid credentials'
+            ], 401);
+        }
+
+        if (!$user->email_verified_at) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please verify your email first',
+                'requires_verification' => true,
+                'user_id' => $user->id
+            ], 422);
+        }
+
+        $token = $user->createToken('mobile-app')->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Login successful',
+            'token' => $token,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+            ]
+        ]);
+    }
+
+    /**
+     * Mobile app register (simplified response)
+     */
+    public function mobileRegister(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => ['required', 'confirmed', Password::defaults()],
+        ]);
+
+        // Generate 6-digit verification code
+        $code = random_int(100000, 999999);
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => $validated['password'],
+            'role' => 'customer',
+            'email_verification_code' => $code,
+            'email_verification_code_created_at' => now(),
+        ]);
+
+        // Send verification code to email
+        try {
+            Mail::to($user->email)->send(new EmailVerificationCode($code));
+        } catch (\Exception $e) {
+            \Log::error('Failed to send verification email', ['error' => $e->getMessage()]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Registration successful. Verification code sent to email.',
+            'user_id' => $user->id,
+            'requires_verification' => true
+        ], 201);
     }
 
     /**

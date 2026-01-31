@@ -45,6 +45,11 @@ return new class extends Migration
             $table->enum('payment_status', ['pending', 'completed', 'failed'])->default('pending');
             $table->string('payment_transaction_id')->nullable();
             
+            // Payment details
+            $table->string('card_number')->nullable(); // For card payments (last 4 digits only for security)
+            $table->string('card_holder_name')->nullable(); // Card holder name
+            $table->string('paypal_username')->nullable(); // For PayPal payments
+            
             // Order totals
             $table->decimal('subtotal', 10, 2);
             $table->decimal('tax', 10, 2)->default(0);
